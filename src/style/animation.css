@@ -1,0 +1,211 @@
+/* animations.css - Version améliorée */
+
+/* Animations existantes */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  
+  @keyframes slideDown {
+    from { transform: translateY(-20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+  }
+  
+  @keyframes slideUp {
+    from { transform: translateY(20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+  }
+  
+  .fade-in {
+    animation: fadeIn 0.7s ease-in-out;
+  }
+  
+  .slide-down {
+    animation: slideDown 0.7s ease-out;
+  }
+  
+  .post-card {
+    animation: slideUp 0.6s ease-out forwards;
+    opacity: 0;
+  }
+  
+  .category-card {
+    animation: slideUp 0.6s ease-out forwards;
+    opacity: 0;
+  }
+  
+  .category-section {
+    animation: fadeIn 0.8s ease-out forwards;
+    opacity: 0;
+  }
+  
+  /* Nouvelles animations pour la page d'article */
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  @keyframes scaleIn {
+    from {
+      opacity: 0;
+      transform: scale(0.95);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+  
+  @keyframes revealText {
+    from {
+      clip-path: inset(0 100% 0 0);
+    }
+    to {
+      clip-path: inset(0 0 0 0);
+    }
+  }
+  
+  @keyframes arrowBounce {
+    0%, 100% {
+      transform: translateX(0);
+    }
+    50% {
+      transform: translateX(-3px);
+    }
+  }
+  
+  @keyframes pulse {
+    0% {
+      transform: scale(1);
+    }
+    50% {
+      transform: scale(1.05);
+    }
+    100% {
+      transform: scale(1);
+    }
+  }
+  
+  @keyframes avatarPop {
+    0% {
+      transform: scale(0.8);
+      opacity: 0;
+    }
+    70% {
+      transform: scale(1.1);
+    }
+    100% {
+      transform: scale(1);
+      opacity: 1;
+    }
+  }
+  
+  @keyframes imageReveal {
+    0% {
+      clip-path: inset(0 0 100% 0);
+    }
+    100% {
+      clip-path: inset(0);
+    }
+  }
+  
+  /* Classes pour les nouvelles animations */
+  .fade-in-up {
+    animation: fadeInUp 0.8s ease-out forwards;
+  }
+  
+  .fade-in-delay {
+    opacity: 0;
+    animation: fadeIn 0.8s ease-out forwards;
+    animation-delay: 0.3s;
+  }
+  
+  .slide-up-fade {
+    opacity: 0;
+    animation: slideUp 0.7s ease-out forwards;
+    animation-delay: 0.5s;
+  }
+  
+  .scale-in {
+    opacity: 0;
+    animation: scaleIn 1s ease-out forwards;
+    animation-delay: 0.2s;
+  }
+  
+  .content-appear > * {
+    opacity: 0;
+    animation: fadeInUp 0.6s ease-out forwards;
+  }
+  
+  .content-appear > *:nth-child(1) { animation-delay: 0.3s; }
+  .content-appear > *:nth-child(2) { animation-delay: 0.4s; }
+  .content-appear > *:nth-child(3) { animation-delay: 0.5s; }
+  .content-appear > *:nth-child(4) { animation-delay: 0.6s; }
+  .content-appear > *:nth-child(5) { animation-delay: 0.7s; }
+  .content-appear > *:nth-child(n+6) { animation-delay: 0.8s; }
+  
+  .hover-lift {
+    transition: transform 0.3s ease;
+  }
+  
+  .hover-lift:hover {
+    transform: translateY(-2px);
+  }
+  
+  .hover-pulse:hover {
+    animation: pulse 1s ease infinite;
+  }
+  
+  .arrow-left {
+    animation: arrowBounce 1.5s ease-in-out infinite;
+  }
+  
+  .reveal-text {
+    animation: revealText 1s cubic-bezier(0.77, 0, 0.175, 1) forwards;
+  }
+  
+  .stagger-fade {
+    opacity: 1;
+  }
+  
+  .stagger-item {
+    opacity: 0;
+    animation: fadeIn 0.8s ease-out forwards;
+  }
+  
+  .stagger-fade .stagger-item:nth-child(1) { animation-delay: 0.1s; }
+  .stagger-fade .stagger-item:nth-child(2) { animation-delay: 0.3s; }
+  .stagger-fade .stagger-item:nth-child(3) { animation-delay: 0.5s; }
+  
+  .delay-0 { animation-delay: 0.05s; }
+  .delay-1 { animation-delay: 0.1s; }
+  .delay-2 { animation-delay: 0.15s; }
+  .delay-3 { animation-delay: 0.2s; }
+  .delay-4 { animation-delay: 0.25s; }
+  
+  .avatar-pop {
+    opacity: 0;
+    animation: avatarPop 0.6s ease-out forwards;
+    animation-delay: 0.7s;
+  }
+  
+  .author-details-reveal {
+    opacity: 0;
+    transform: translateX(10px);
+    animation: fadeInUp 0.6s ease-out forwards;
+    animation-delay: 0.8s;
+  }
+  
+  .image-reveal {
+    overflow: hidden;
+  }
+  
+  .image-reveal img {
+    animation: imageReveal 1.2s cubic-bezier(0.77, 0, 0.175, 1) forwards;
+  }
