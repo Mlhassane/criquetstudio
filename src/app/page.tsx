@@ -161,7 +161,7 @@ const HeroSection = ({
                     </span>
                   </div>
                   <h2 className="text-2xl font-bold mb-2 group-hover:text-red-400 transition-colors">
-                    {featuredArticle.title}
+                    <Link href={`/articles/${featuredArticle.slug.current}`} >{featuredArticle.title}</Link>
                   </h2>
                   <p className="text-sm opacity-90 line-clamp-2">{featuredArticle.excerpt}</p>
                   <div className="mt-3 flex items-center justify-between">
@@ -276,6 +276,7 @@ const CategoriesSection = ({ categories }: { categories: Category[] }) => (
         <Link
           href="/articles"
           className="whitespace-nowrap px-4 py-2 rounded-full bg-red-600 text-white text-sm font-medium flex-shrink-0"
+          aria-label="Voir les articles à la une" // Added aria-label
         >
           À la une
         </Link>
@@ -284,6 +285,7 @@ const CategoriesSection = ({ categories }: { categories: Category[] }) => (
             href={`/rubriques/${category.slug.current}`}
             key={category._id}
             className="whitespace-nowrap px-4 py-2 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-800 text-sm font-medium flex-shrink-0 transition-colors"
+            aria-label={`Voir la rubrique ${category.title}`} // Added aria-label
           >
             {category.title}
           </Link>
@@ -330,77 +332,57 @@ const TrendingSection = ({ articles }: { articles: Post[] }) => (
   </section>
 );
 
-const LatestNewsSection = ({ articles }: { articles: Post[] }) => (
-  <section className="container mx-auto px-4 py-8">
-    <SectionHeader title="Dernières nouvelles" link="/articles" />
-    <div className="grid md:grid-cols-2 gap-8">
-      {articles[0] && (
-        <div>
-          <Link href={`/articles/${articles[0].slug.current}`} className="group block">
-            <div className="relative w-full h-80 mb-4 overflow-hidden rounded-md">
-              {articles[0].mainImage && (
-                <Image
-                  src={urlForImage(articles[0].mainImage).width(800).height(600).url()}
-                  alt={articles[0].title}
-                  fill
-                  className="object-cover transition-transform duration-300 group-hover:scale-105"
-                  sizes="(max-width: 768px) 100vw, 50vw"
-                />
-              )}
-              {articles[0].categories?.[0] && (
-                <div className="absolute top-3 left-3 bg-red-600 text-white text-xs px-2 py-1 rounded">
-                  {articles[0].categories[0].title}
-                </div>
-              )}
-            </div>
-            <div className="text-xs text-gray-500 mb-2">
-              {new Date(articles[0].publishedAt).toLocaleDateString("fr-FR", {
-                day: "numeric",
-                month: "long",
-                year: "numeric",
-              })}
-            </div>
-            <h3 className="font-bold text-xl mb-2 group-hover:text-red-600 transition-colors">
-              {articles[0].title}
-            </h3>
-            <p className="text-gray-600 line-clamp-3">{articles[0].excerpt}</p>
-          </Link>
-        </div>
-      )}
-      <div className="space-y-4">
-        {articles.slice(1, 5).map((article) => (
-          <ArticleCard key={article._id} article={article} variant="horizontal" />
-        ))}
-      </div>
-    </div>
-  </section>
-);
+const LatestNewsSection = ({ articles }: { articles: Post[] }) => {
+  const featuredArticle = articles[0];
+  const otherArticles = articles.slice(1, 5);
 
-const EventSection = () => (
-  <section className="container mx-auto px-4 py-8">
-    <div className="bg-gradient-to-r from-gray-900 to-gray-800 p-6 rounded-lg text-white relative overflow-hidden">
-      <div className="relative z-10 md:w-2/3">
-        <div className="text-sm text-red-400 mb-2 font-medium">ÉVÉNEMENT À VENIR</div>
-        <h2 className="text-2xl font-bold mb-2">Conférence sur les enjeux médiatiques en Afrique</h2>
-        <p className="text-gray-300 mb-4">
-          Du 15 au 20 Juin 2025 | Centre de conférences internationales, Niamey
-        </p>
-        <Link
-          href="/evenements"
-          className="inline-block bg-red-600 px-4 py-2 rounded text-sm font-medium hover:bg-red-700 transition-colors"
-        >
-          En savoir plus
-        </Link>
+  return (
+    <section className="container mx-auto px-4 py-8">
+      <SectionHeader title="Dernières nouvelles" link="/articles" />
+      <div className="grid md:grid-cols-2 gap-8">
+        {featuredArticle && (
+          <div>
+            <Link href={`/articles/${featuredArticle.slug.current}`} className="group block">
+              <div className="relative w-full h-80 mb-4 overflow-hidden rounded-md">
+                {featuredArticle.mainImage && (
+                  <Image
+                    src={urlForImage(featuredArticle.mainImage).width(800).height(600).url()}
+                    alt={featuredArticle.title}
+                    fill
+                    className="object-cover transition-transform duration-300 group-hover:scale-105"
+                    sizes="(max-width: 768px) 100vw, 50vw"
+                  />
+                )}
+                {featuredArticle.categories?.[0] && (
+                  <div className="absolute top-3 left-3 bg-red-600 text-white text-xs px-2 py-1 rounded">
+                    {featuredArticle.categories[0].title}
+                  </div>
+                )}
+              </div>
+              <div className="text-xs text-gray-500 mb-2">
+                {new Date(featuredArticle.publishedAt).toLocaleDateString("fr-FR", {
+                  day: "numeric",
+                  month: "long",
+                  year: "numeric",
+                })}
+              </div>
+              <h3 className="font-bold text-xl mb-2 group-hover:text-red-600 transition-colors">
+                {featuredArticle.title}
+              </h3>
+              <p className="text-gray-600 line-clamp-3">{featuredArticle.excerpt}</p>
+            </Link>
+          </div>
+        )}
+        <div className="space-y-4">
+          {otherArticles.map((article) => (
+            <ArticleCard key={article._id} article={article} variant="horizontal" />
+          ))}
+        </div>
       </div>
-      <div className="absolute top-0 right-0 w-1/3 h-full opacity-20 md:opacity-40">
-        <div
-          className="w-full h-full bg-contain bg-no-repeat bg-right-top"
-          style={{ backgroundImage: "url('/event-illustration.svg')" }}
-        />
-      </div>
-    </div>
-  </section>
-);
+    </section>
+  );
+};
+
 
 const RegionalNewsSection = ({ articles }: { articles: Post[] }) => (
   <section className="container mx-auto px-4 py-8">
@@ -480,12 +462,17 @@ const HomeContent = async () => {
 
   return (
     <>
+      {/* Articles */}
       <HeroSection featuredArticle={featuredArticle} sidebarArticles={sidebarArticles} />
-      <CategoriesSection categories={categories} />
       <TrendingSection articles={trendingArticles} />
       <LatestNewsSection articles={latestArticles} />
-      <EventSection />
-      {regionalArticles.length > 0 && <RegionalNewsSection articles={regionalArticles} />}
+      <RegionalNewsSection articles={regionalArticles} />
+
+      {/* Catégories */}
+      <CategoriesSection categories={categories} />
+
+      {/* Autres */}
+      {/* <EventSection /> */}
       <NewsletterSection />
     </>
   );
