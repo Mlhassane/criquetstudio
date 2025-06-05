@@ -6,6 +6,7 @@ import { Post } from "@/types/post";
 import Image from "next/image";
 import { urlForImage } from "@/lib/sanity.image";
 import SearchBar from "@/components/search-bar";
+import { Clock, Filter, Calendar } from 'lucide-react';
 
 // ======================================================================
 // Sanity Query
@@ -60,85 +61,190 @@ const SearchPageSkeleton = () => (
 // Main Component
 // ======================================================================
 
-const SearchContent = async ({ searchParams }: { searchParams: Promise<{ q?: string }> }) => {
-  const { q = "" } = await searchParams;
+const FilterBar = ({ onFilterChange }: { onFilterChange: (filters: any) => void }) => (
+  <div className="flex flex-wrap gap-4 mb-6 p-4 bg-gray-50 rounded-lg">
+    <div className="flex items-center gap-2">
+      <Filter className="h-4 w-4 text-gray-500" />
+      <select 
+        className="text-sm border rounded-md px-3 py-1"
+        onChange={(e) => onFilterChange({ category: e.target.value })}
+      >
+        <option value="">Toutes les catégories</option>
+        <option value="actualite">Actualité</option>
+        <option value="politique">Politique</option>
+        <option value="economie">Économie</option>
+        {/* Ajouter d'autres catégories */}
+      </select>
+    </div>
+    <div className="flex items-center gap-2">
+      <Calendar className="h-4 w-4 text-gray-500" />
+      <select 
+        className="text-sm border rounded-md px-3 py-1"
+        onChange={(e) => onFilterChange({ date: e.target.value })}
+      >
+        <option value="">Toutes les dates</option>
+        <option value="today">Aujourd'hui</option>
+        <option value="week">Cette semaine</option>
+        <option value="month">Ce mois</option>
+        <option value="year">Cette année</option>
+      </select>
+    </div>
+  </div>
+);
+
+const SearchContent = async ({ searchParams }: { searchParams: Promise<{ q?: string; page?: string; category?: string; date?: string }> }) => {
+  const { q = "", page = "1", category = "", date = "" } = await searchParams;
   const query = q.trim();
+  const currentPage = parseInt(page);
+  const itemsPerPage = 9;
+  
   let articles: Post[] = [];
+  let totalResults = 0;
 
   if (query) {
     try {
-      articles = await sanityClient.fetch<Post[]>(searchQuery, { query: `${query}*` } as Record<string, unknown>);
+      // Modifier la requête pour inclure les filtres
+      const filterConditions = [];
+      if (category) filterConditions.push(`categories[]->title match "${category}"`);
+      if (date) {
+        const dateFilter = getDateFilter(date);
+        if (dateFilter) filterConditions.push(dateFilter);
+      }
+
+      const filterQuery = filterConditions.length > 0 
+        ? `&& (${filterConditions.join(" && ")})` 
+        : "";
+
+      const searchQueryWithFilters = groq`
+        *[_type == "post" && (title match $query || excerpt match $query) ${filterQuery}] | order(publishedAt desc) {
+          _id,
+          title,
+          publishedAt,
+          excerpt,
+          slug,
+          mainImage,
+          "author": author->{_id, name},
+          "categories": categories[]->{_id, title}
+        }
+      `;
+
+      articles = await sanityClient.fetch<Post[]>(
+        searchQueryWithFilters, 
+        { 
+          query: `${query}*`,
+          start: (currentPage - 1) * itemsPerPage,
+          limit: itemsPerPage
+        }
+      );
+
+      // Obtenir le nombre total de résultats
+      const countQuery = groq`count(*[_type == "post" && (title match $query || excerpt match $query) ${filterQuery}])`;
+      totalResults = await sanityClient.fetch<number>(countQuery, { query: `${query}*` });
     } catch (error) {
       console.error("Erreur lors de la recherche :", error);
     }
   }
+
+  const totalPages = Math.ceil(totalResults / itemsPerPage);
 
   return (
     <div className="min-h-screen flex flex-col bg-white">
       <main className="flex-1">
         <div className="container mx-auto px-4 py-8">
           <div className="mb-8">
-            <Link href="/" className="text-sm text-gray-500 hover:text-gray-700">
-              ← Retour à l'accueil
+            <Link href="/" className="text-sm text-gray-500 hover:text-gray-700 flex items-center gap-2">
+              <ChevronLeft className="h-4 w-4" />
+              Retour à l'accueil
             </Link>
             <h1 className="text-3xl font-bold mt-4 mb-2">Résultats de recherche</h1>
             <p className="text-gray-500">
-              {articles.length} résultat{articles.length !== 1 ? "s" : ""} pour "{query}"
+              {totalResults} résultat{totalResults !== 1 ? "s" : ""} pour "{query}"
             </p>
           </div>
 
+          <FilterBar onFilterChange={(filters) => {
+            console.log('Filtres appliqués:', filters);
+          }} />
+
           {articles.length > 0 ? (
-            <div className="grid md:grid-cols-3 gap-8">
-              {articles.map((article) => (
-                <Link
-                  key={article._id}
-                  href={`/articles/${article.slug.current}`}
-                  className="group block p-4 border rounded hover:bg-gray-50 transition-colors"
-                >
-                  <div className="relative w-full h-48 overflow-hidden rounded-md mb-4">
-                    {article.mainImage ? (
-                      <Image
-                        src={urlForImage(article.mainImage).width(500).height(300).url()}
-                        alt={article.title}
-                        fill
-                        className="object-cover transition-transform duration-300 group-hover:scale-105"
-                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 33vw"
-                      />
-                    ) : (
-                      <div className="w-full h-full bg-gray-200 flex items-center justify-center">
-                        <span className="text-gray-400 text-sm">Aucune image</span>
-                      </div>
-                    )}
-                    {article.categories?.[0] && (
-                      <div className="absolute top-3 left-3 bg-red-600 text-white text-xs px-2 py-1 rounded">
-                        {article.categories[0].title}
-                      </div>
-                    )}
-                  </div>
-                  <div className="text-xs text-gray-500 mb-2">
-                    {new Date(article.publishedAt).toLocaleDateString("fr-FR")}
-                  </div>
-                  <h2 className="text-xl font-semibold group-hover:text-red-600 transition-colors">
-                    {article.title}
-                  </h2>
-                  <p className="text-sm text-gray-600 mt-2 line-clamp-2">{article.excerpt}</p>
-                  {article.author?.name && (
-                    <div className="mt-3 flex items-center">
-                      <div className="w-8 h-8 bg-indigo-100 rounded-full flex items-center justify-center text-indigo-500 font-medium">
-                        {article.author.name.charAt(0)}
-                      </div>
-                      <span className="ml-2 text-sm text-gray-600">
-                        Par <span className="font-medium">{article.author.name}</span>
-                      </span>
+            <>
+              <div className="grid md:grid-cols-3 gap-8">
+                {articles.map((article) => (
+                  <Link
+                    key={article._id}
+                    href={`/articles/${article.slug.current}`}
+                    className="group block p-4 border rounded hover:bg-gray-50 transition-colors"
+                  >
+                    <div className="relative w-full h-48 overflow-hidden rounded-md mb-4">
+                      {article.mainImage ? (
+                        <Image
+                          src={urlForImage(article.mainImage).width(500).height(300).url()}
+                          alt={article.title}
+                          fill
+                          className="object-cover transition-transform duration-300 group-hover:scale-105"
+                          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 33vw"
+                        />
+                      ) : (
+                        <div className="w-full h-full bg-gray-200 flex items-center justify-center">
+                          <span className="text-gray-400 text-sm">Aucune image</span>
+                        </div>
+                      )}
+                      {article.categories?.[0] && (
+                        <div className="absolute top-3 left-3 bg-red-600 text-white text-xs px-2 py-1 rounded">
+                          {article.categories[0].title}
+                        </div>
+                      )}
                     </div>
-                  )}
-                </Link>
-              ))}
-            </div>
+                    <div className="text-xs text-gray-500 mb-2">
+                      {new Date(article.publishedAt).toLocaleDateString("fr-FR")}
+                    </div>
+                    <h2 className="text-xl font-semibold group-hover:text-red-600 transition-colors">
+                      {article.title}
+                    </h2>
+                    <p className="text-sm text-gray-600 mt-2 line-clamp-2">{article.excerpt}</p>
+                    {article.author?.name && (
+                      <div className="mt-3 flex items-center">
+                        <div className="w-8 h-8 bg-indigo-100 rounded-full flex items-center justify-center text-indigo-500 font-medium">
+                          {article.author.name.charAt(0)}
+                        </div>
+                        <span className="ml-2 text-sm text-gray-600">
+                          Par <span className="font-medium">{article.author.name}</span>
+                        </span>
+                      </div>
+                    )}
+                  </Link>
+                ))}
+              </div>
+
+              {totalPages > 1 && (
+                <div className="mt-8 flex justify-center gap-2">
+                  {Array.from({ length: totalPages }, (_, i) => i + 1).map((pageNum) => (
+                    <Link
+                      key={pageNum}
+                      href={`/recherche?q=${query}&page=${pageNum}${category ? `&category=${category}` : ''}${date ? `&date=${date}` : ''}`}
+                      className={`px-4 py-2 rounded-md ${
+                        currentPage === pageNum
+                          ? 'bg-red-600 text-white'
+                          : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                      }`}
+                    >
+                      {pageNum}
+                    </Link>
+                  ))}
+                </div>
+              )}
+            </>
           ) : (
             <div className="text-center py-12">
               <p className="text-gray-500 mb-4">Aucun résultat trouvé pour votre recherche.</p>
-              <p className="text-gray-500">Essayez avec d'autres mots-clés ou consultez nos catégories.</p>
+              <div className="space-y-2">
+                <p className="text-gray-500">Suggestions :</p>
+                <ul className="text-sm text-gray-600">
+                  <li>• Vérifiez l'orthographe des mots</li>
+                  <li>• Utilisez des termes plus généraux</li>
+                  <li>• Essayez d'autres mots-clés</li>
+                </ul>
+              </div>
             </div>
           )}
         </div>
@@ -214,7 +320,28 @@ const SearchContent = async ({ searchParams }: { searchParams: Promise<{ q?: str
   );
 };
 
-export default async function SearchPage({ searchParams }: { searchParams: Promise<{ q?: string }> }) {
+// Fonction utilitaire pour les filtres de date
+const getDateFilter = (dateRange: string) => {
+  const now = new Date();
+  switch (dateRange) {
+    case 'today':
+      const today = new Date(now.setHours(0, 0, 0, 0));
+      return `publishedAt >= "${today.toISOString()}"`;
+    case 'week':
+      const weekAgo = new Date(now.setDate(now.getDate() - 7));
+      return `publishedAt >= "${weekAgo.toISOString()}"`;
+    case 'month':
+      const monthAgo = new Date(now.setMonth(now.getMonth() - 1));
+      return `publishedAt >= "${monthAgo.toISOString()}"`;
+    case 'year':
+      const yearAgo = new Date(now.setFullYear(now.getFullYear() - 1));
+      return `publishedAt >= "${yearAgo.toISOString()}"`;
+    default:
+      return null;
+  }
+};
+
+export default async function SearchPage({ searchParams }: { searchParams: Promise<{ q?: string; page?: string; category?: string; date?: string }> }) {
   return (
     <Suspense fallback={<SearchPageSkeleton />}>
       <SearchContent searchParams={searchParams} />
