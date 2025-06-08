@@ -1,6 +1,6 @@
 'use client'
 import { useState, ChangeEvent, MouseEvent } from 'react';
-import { Mail, Phone, MapPin, Clock, CheckCircle, AlertCircle } from 'lucide-react';
+import { Mail, Phone, MapPin, Clock, CheckCircle, AlertCircle, Youtube, Facebook, Linkedin } from 'lucide-react';
 
 export default function ContactPage() {
   const [formData, setFormData] = useState({
@@ -143,7 +143,7 @@ export default function ContactPage() {
                     <div>
                       <p className="font-semibold text-gray-900">Téléphone</p>
                       <a href="tel:+22780172886" className="text-blue-600 hover:text-blue-800 mt-1 block">
-                        +227 80172886
+                        +227 84483737
                       </a>
                     </div>
                   </div>
@@ -179,6 +179,51 @@ export default function ContactPage() {
                       <span className="text-gray-600">Dimanche:</span>
                       <span className="font-medium text-red-600">Fermé</span>
                     </div>
+                  </div>
+                </div>
+
+                {/* Ajout des liens sociaux */}
+                <div className="mt-8 pt-6 border-t border-gray-200">
+                  <h3 className="font-semibold text-gray-900 mb-4">Suivez-nous</h3>
+                  <div className="flex space-x-4">
+                    <a
+                      href="https://www.youtube.com/@CriquetStudio"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center space-x-2 bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors"
+                    >
+                      <Youtube className="h-5 w-5" />
+                      <span>YouTube</span>
+                    </a>
+                    <a
+                      href="https://www.facebook.com/share/1EgUaU4H5n/"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center space-x-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+                    >
+                      <Facebook className="h-5 w-5" />
+                      <span>Facebook</span>
+                    </a>
+                    <a
+                      href="https://www.tiktok.com/@criquet_broadcast_studio"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center space-x-2 bg-black text-white px-4 py-2 rounded-lg hover:bg-gray-800 transition-colors"
+                    >
+                      <svg className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1.04-.1z"/>
+                      </svg>
+                      <span>TikTok</span>
+                    </a>
+                    <a
+                      href="https://www.linkedin.com/posts/criquetbroadcaststudio_paixducagbur-respectavanttout-activity-7334212291971756032-11r5?utm_source=share&utm_medium=member_android&rcm=ACoAACdchA4BtCehRxnsBeZQXFY675IvhHqN-WY"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center space-x-2 bg-blue-700 text-white px-4 py-2 rounded-lg hover:bg-blue-800 transition-colors"
+                    >
+                      <Linkedin className="h-5 w-5" />
+                      <span>LinkedIn</span>
+                    </a>
                   </div>
                 </div>
               </div>
