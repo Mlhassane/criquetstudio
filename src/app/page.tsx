@@ -317,15 +317,12 @@ const SectionHeader = ({
 
 const TrendingSection = ({ articles }: { articles: Post[] }) => {
   const trendingArticles = articles.filter((post) => 
-    post.categories?.some((cat) => 
-      cat.title.toLowerCase() === "Tendance" || 
-      cat.title.toLowerCase() === "Tendances"
-    )
+    post.categories?.some((cat) => cat.title === "Tendances")
   );
 
   return (
     <section className="container mx-auto px-4 py-8">
-      <SectionHeader title="Actualités tendance" link="/rubriques/tendance" />
+      <SectionHeader title="Actualités tendance" link="/rubriques/tendances" />
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
         {trendingArticles.length > 0 ? (
           trendingArticles.map((article) => (
