@@ -1,120 +1,106 @@
-import Link from "next/link"
-import Image from "next/image"
-import SearchBar from "@/components/search-bar"
+'use client'
+import { Camera, Video, Radio, Music, Users, Award, Target, Heart } from 'lucide-react';
 
 export default function AboutPage() {
   return (
-    <div className="min-h-screen flex flex-col bg-white">
-      {/* Header */}
-
-
+    <div className="min-h-screen bg-white">
       <main className="flex-1">
-        <div className="container mx-auto px-4 py-8">
-          {/* <div className="mb-8">
-          
-            <h1 className="text-3xl font-bold mt-4 mb-2">À propos de Niger Info</h1>
-            <p className="text-gray-500">Découvrez notre histoire et notre mission</p>
+        <div className="container mx-auto px-4 py-12">
+          {/* Hero Section */}
+          <div className="text-center mb-16">
+            <h1 className="text-4xl font-bold text-gray-900 mb-4">À Propos de Criquet Brodcast Studio</h1>
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+              Une société de production audiovisuelle passionnée, dédiée à donner vie à vos projets créatifs avec excellence et innovation.
+            </p>
           </div>
 
-          <div className="grid md:grid-cols-2 gap-12 mb-12">
-            <div>
-              <h2 className="text-xl font-bold mb-4">Notre mission</h2>
-              <p className="text-gray-600 mb-4">
-                Niger Info a été fondé en 2020 avec une mission claire : fournir une information fiable, équilibrée et accessible sur l'actualité nigérienne et internationale.
-              </p>
-              <p className="text-gray-600 mb-4">
-                Dans un monde où la désinformation se propage rapidement, nous nous engageons à vérifier rigoureusement nos sources et à présenter les faits avec précision et impartialité.
-              </p>
-              <p className="text-gray-600">
-                Notre équipe de journalistes professionnels travaille chaque jour pour couvrir les événements qui façonnent notre pays et notre monde, avec un accent particulier sur les enjeux qui touchent directement les Nigériens.
+          {/* Notre Mission */}
+          <div className="max-w-4xl mx-auto mb-16">
+            <div className="bg-gray-50 rounded-xl p-8 shadow-sm">
+              <h2 className="text-2xl font-bold text-gray-900 mb-6">Notre Mission</h2>
+              <p className="text-gray-600 leading-relaxed">
+                Chez Criquet Studio, nous nous engageons à fournir des services audiovisuels de haute qualité, 
+                en combinant créativité, expertise technique et professionnalisme. Notre objectif est de 
+                transformer vos idées en contenus visuels captivants qui racontent votre histoire de manière unique.
               </p>
             </div>
-            <div>
-              <Image
-                src="/placeholder.svg?height=400&width=600"
-                width={600}
-                height={400}
-                alt="L'équipe de Niger Info"
-                className="rounded-lg"
+          </div>
+
+          {/* Nos Services */}
+          <div className="mb-16">
+            <h2 className="text-2xl font-bold text-gray-900 mb-8 text-center">Nos Services</h2>
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+              <ServiceCard
+                icon={<Camera className="h-8 w-8" />}
+                title="Production Photo"
+                description="Services photographiques professionnels pour vos événements et projets"
+              />
+              <ServiceCard
+                icon={<Video className="h-8 w-8" />}
+                title="Production Vidéo"
+                description="Réalisation de films, documentaires et contenus vidéo créatifs"
+              />
+           
+              <ServiceCard
+                icon={<Music className="h-8 w-8" />}
+                title="Studio d'Enregistrement"
+                description="Enregistrement professionnel pour vos projets musicaux"
               />
             </div>
-          </div> */}
+          </div>
 
-          {/* <div className="border-t border-b py-12 my-12">
-            <h2 className="text-xl font-bold mb-6 text-center">Nos valeurs</h2>
-            <div className="grid md:grid-cols-3 gap-8">
-              <div className="text-center">
-                <div className="bg-gray-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <svg className="h-8 w-8 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                  </svg>
-                </div>
-                <h3 className="font-bold mb-2">Intégrité</h3>
-                <p className="text-gray-600">
-                  Nous nous engageons à rapporter les faits avec honnêteté et transparence, sans céder aux pressions politiques ou commerciales.
-                </p>
-              </div>
-              <div className="text-center">
-                <div className="bg-gray-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <svg className="h-8 w-8 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-                  </svg>
-                </div>
-                <h3 className="font-bold mb-2">Diversité</h3>
-                <p className="text-gray-600">
-                  Nous valorisons la diversité des perspectives et nous efforçons de représenter toutes les voix de la société nigérienne.
-                </p>
-              </div>
-              <div className="text-center">
-                <div className="bg-gray-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <svg className="h-8 w-8 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                  </svg>
-                </div>
-                <h3 className="font-bold mb-2">Innovation</h3>
-                <p className="text-gray-600">
-                  Nous embrassons les nouvelles technologies pour rendre l'information plus accessible et engageante pour tous les Nigériens.
-                </p>
-              </div>
+          {/* Nos Valeurs */}
+          <div className="mb-16">
+            <h2 className="text-2xl font-bold text-gray-900 mb-8 text-center">Nos Valeurs</h2>
+            <div className="grid md:grid-cols-3 gap-6">
+              <ValueCard
+                icon={<Target className="h-8 w-8" />}
+                title="Excellence"
+                description="Nous visons l'excellence dans chaque projet, en garantissant des résultats de haute qualité"
+              />
+              <ValueCard
+                icon={<Heart className="h-8 w-8" />}
+                title="Passion"
+                description="Notre passion pour l'audiovisuel se reflète dans chaque création"
+              />
+              <ValueCard
+                icon={<Users className="h-8 w-8" />}
+                title="Collaboration"
+                description="Nous croyons en la force du travail d'équipe et de la collaboration créative"
+              />
             </div>
           </div>
 
-          <div className="mb-12">
-            <h2 className="text-xl font-bold mb-6">Notre équipe</h2>
-            <div className="grid md:grid-cols-4 gap-6">
-              {[
-                { name: "Mahamne Lawaly", role: "Chriniqueur tech", image: "/placeholder.svg?height=300&width=300" },
-              ].map((member, index) => (
-                <div key={index} className="text-center">
-                  <Image
-                    src={member.image || "/placeholder.svg"}
-                    width={200}
-                    height={200}
-                    alt={member.name}
-                    className="rounded-full mx-auto mb-4"
-                  />
-                  <h3 className="font-bold">{member.name}</h3>
-                  <p className="text-gray-600">{member.role}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div className="bg-gray-50 p-8 rounded-lg">
-            <h2 className="text-xl font-bold mb-4">Nous contacter</h2>
-            <p className="text-gray-600 mb-4">
-              Vous avez des questions, des suggestions ou souhaitez nous signaler une information ? N'hésitez pas à nous contacter.
+          {/* Notre Équipe */}
+          <div className="text-center mb-16">
+            <h2 className="text-2xl font-bold text-gray-900 mb-8">Notre Équipe</h2>
+            <p className="text-gray-600 max-w-3xl mx-auto">
+              Une équipe passionnée de professionnels de l'audiovisuel, dédiée à donner vie à vos projets 
+              avec créativité et expertise technique.
             </p>
-            <Link
-              href="/contact"
-              className="inline-block px-4 py-2 bg-gray-800 text-white rounded-md hover:bg-gray-700 transition-colors"
-            >
-              Contactez-nous
-            </Link>
-          </div> */}
+          </div>
         </div>
       </main>
+    </div>
+  );
+}
 
-     </div>
-    )
- }
+function ServiceCard({ icon, title, description }: { icon: React.ReactNode, title: string, description: string }) {
+  return (
+    <div className="bg-white p-6 rounded-lg shadow-sm border hover:shadow-md transition-shadow">
+      <div className="text-blue-600 mb-4">{icon}</div>
+      <h3 className="text-lg font-semibold text-gray-900 mb-2">{title}</h3>
+      <p className="text-gray-600">{description}</p>
+    </div>
+  );
+}
+
+function ValueCard({ icon, title, description }: { icon: React.ReactNode, title: string, description: string }) {
+  return (
+    <div className="bg-gray-50 p-6 rounded-lg text-center">
+      <div className="text-blue-600 mb-4 flex justify-center">{icon}</div>
+      <h3 className="text-lg font-semibold text-gray-900 mb-2">{title}</h3>
+      <p className="text-gray-600">{description}</p>
+    </div>
+  );
+}
