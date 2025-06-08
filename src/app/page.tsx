@@ -315,22 +315,31 @@ const SectionHeader = ({
   </div>
 );
 
-const TrendingSection = ({ articles }: { articles: Post[] }) => (
-  <section className="container mx-auto px-4 py-8">
-    <SectionHeader title="Actualités tendance" link="/rubriques/tendance" />
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-      {articles.length > 0 ? (
-        articles.map((article) => (
-          <ArticleCard key={article._id} article={article} variant="vertical" />
-        ))
-      ) : (
-        <div className="md:col-span-3 text-center py-8 text-gray-500">
-          Aucun article tendance disponible
-        </div>
-      )}
-    </div>
-  </section>
-);
+const TrendingSection = ({ articles }: { articles: Post[] }) => {
+  const trendingArticles = articles.filter((post) => 
+    post.categories?.some((cat) => 
+      cat.title.toLowerCase() === "Tendance" || 
+      cat.title.toLowerCase() === "Tendances"
+    )
+  );
+
+  return (
+    <section className="container mx-auto px-4 py-8">
+      <SectionHeader title="Actualités tendance" link="/rubriques/tendance" />
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        {trendingArticles.length > 0 ? (
+          trendingArticles.map((article) => (
+            <ArticleCard key={article._id} article={article} variant="vertical" />
+          ))
+        ) : (
+          <div className="md:col-span-3 text-center py-8 text-gray-500">
+            Aucun article tendance disponible
+          </div>
+        )}
+      </div>
+    </section>
+  );
+};
 
 const LatestNewsSection = ({ articles }: { articles: Post[] }) => {
   const featuredArticle = articles[0];
