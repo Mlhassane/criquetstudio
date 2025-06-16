@@ -26,7 +26,7 @@ const TikTokIcon = () => (
   </svg>
 );
 
-export default function Footer() {
+const Footer: React.FC = () => {
   const [isVisible, setIsVisible] = useState(false)
 
   useEffect(() => {
@@ -197,3 +197,4 @@ export default function Footer() {
     </footer>
   )
 }
+export default Footer;
