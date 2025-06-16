@@ -13,9 +13,7 @@ const nextConfig = {
     ],
   },
   // Increase timeout for image optimization
-  experimental: {
-    imageLoaderTimeoutInSeconds: 30,
-  },
+ 
 }
 
 module.exports = nextConfig
