@@ -1,11 +1,10 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { getClient } from '@/lib/sanity.preview'
-import { groq } from 'next-sanity'
 
 type UseLiveQueryOptions = {
   initialData: any
-  query: string | groq.GroqQuery
+  query: string
   params?: Record<string, any>
   enabled?: boolean
 }
@@ -18,7 +17,8 @@ export function useLiveQuery<T>({
 }: UseLiveQueryOptions) {
   const [data, setData] = useState<T>(initialData)
   const router = useRouter()
-  const isPreview = router.isPreview
+  const searchParams = new URLSearchParams(window.location.search)
+  const isPreview = searchParams.get('preview') === 'true'
 
   useEffect(() => {
     // Ne pas souscrire si le mode preview n'est pas activé ou si enabled est false
@@ -40,7 +40,7 @@ export function useLiveQuery<T>({
     const subscription = client
       .listen(query, params)
       .subscribe((update) => {
-        if (update.transition === 'update' || update.transition === 'create' || update.transition === 'delete') {
+        if (update.transition === 'update' || update.transition === 'appear' || update.transition === 'disappear') {
           fetchData()
         }
       })
