@@ -185,7 +185,7 @@ const SearchBar = () => {
             <input
               type="text"
               placeholder="Rechercher..."
-              className="bg-gray-100 py-2 px-4 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="bg-gray-100 py-2 px-4 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-red-500"
             />
             <button 
               onClick={() => setIsSearchOpen(false)}
@@ -197,7 +197,7 @@ const SearchBar = () => {
         ) : (
           <button 
             onClick={() => setIsSearchOpen(true)}
-            className="text-gray-700 hover:text-blue-600 transition-colors"
+            className="text-gray-700 hover:text-red-600 transition-colors"
           >
             <Search size={20} />
           </button>

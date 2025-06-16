@@ -27,7 +27,7 @@ export default function ShareButtons({ title }: Props) {
         href={`https://twitter.com/intent/tweet?url=${encodeURIComponent(url)}&text=${title}`}
         target="_blank"
         rel="noopener noreferrer"
-        className="text-sm text-blue-500 hover:underline"
+        className="text-sm text-red-500 hover:underline"
       >
         Twitter
       </a>
@@ -35,7 +35,7 @@ export default function ShareButtons({ title }: Props) {
         href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`}
         target="_blank"
         rel="noopener noreferrer"
-        className="text-sm text-blue-600 hover:underline"
+        className="text-sm text-red-600 hover:underline"
       >
         Facebook
       </a>
@@ -43,7 +43,7 @@ export default function ShareButtons({ title }: Props) {
         href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`}
         target="_blank"
         rel="noopener noreferrer"
-        className="text-sm text-blue-700 hover:underline"
+        className="text-sm text-red-700 hover:underline"
       >
         LinkedIn
       </a>

@@ -44,7 +44,7 @@ export default function AnimatedPostContent({ post }: AnimatedPostContentProps) 
                 fill
                 className="object-cover"
               />
-              <div className="absolute inset-0 bg-black/30" />
+              <div className="absolute inset-0 bg-primary/30" />
             </div>
           )}
 
@@ -52,7 +52,7 @@ export default function AnimatedPostContent({ post }: AnimatedPostContentProps) 
             <div className="bg-white p-6 md:p-10 max-w-4xl mx-auto shadow-sm rounded-lg">
               <button
                 onClick={() => router.back()}
-                className="flex items-center gap-2 text-sm text-black/60 hover:text-black mb-6"
+                className="flex items-center gap-2 text-sm text-primary/60 hover:text-primary mb-6"
               >
                 <ArrowLeft className="w-4 h-4" />
                 Page Accueil
@@ -60,7 +60,7 @@ export default function AnimatedPostContent({ post }: AnimatedPostContentProps) 
 
               <div className="flex items-center gap-3 mb-4">
                 {post.category?.title && (
-                  <span className="bg-black text-white px-3 py-1 rounded-full">
+                  <span className="bg-primary text-white px-3 py-1 rounded-full">
                     {post.category.title}
                   </span>
                 )}

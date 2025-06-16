@@ -34,16 +34,43 @@ export interface Category {
 // ✅ Article (Post)
 export interface Post {
   _id: string;
-  _createdAt?: string;
   title: string;
+  slug: {
+    current: string;
+  };
+  mainImage?: {
+    asset: {
+      _ref: string;
+      _type: 'reference';
+    };
+  };
   publishedAt: string;
   excerpt?: string;
-  slug: Slug;
+  body?: Array<{
+    _type: string;
+    children: Array<{
+      _type: string;
+      text?: string;
+    }>;
+  }>;
   youtubeUrl?: string;
-  mainImage?: SanityImage;
-  author?: Author;
-  categories?: Category[];
-  body?: PortableTextBlock[];
+  categories?: Array<{
+    _id: string;
+    title: string;
+    slug: {
+      current: string;
+    };
+  }>;
+  author?: {
+    _id: string;
+    name: string;
+    image?: {
+      asset: {
+        _ref: string;
+        _type: 'reference';
+      };
+    };
+  };
 }
 
 // ✅ Catégorie avec articles

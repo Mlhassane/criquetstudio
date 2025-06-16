@@ -1,0 +1,1236 @@
+import Image from "next/image";
+import Link from "next/link";
+import { Suspense } from "react";
+import { sanityClient } from "@/lib/sanity";
+import { postsQuery, categoriesQuery } from "@/lib/querie";
+import { Post, Category } from "@/types/post";
+import { urlForImage } from "@/lib/sanity.image";
+
+// Skeleton components
+const ArticleSkeleton = () => (
+  <div className="animate-pulse flex gap-4 p-4 border-b">
+    <div className="bg-gray-200 w-24 h-20 rounded"></div>
+    <div className="flex-1">
+      <div className="h-3 bg-gray-200 rounded w-24 mb-2"></div>
+      <div className="h-5 bg-gray-300 rounded w-full mb-1"></div>
+      <div className="h-5 bg-gray-300 rounded w-3/4"></div>
+    </div>
+  </div>
+);
+
+const GridArticleSkeleton = () => (
+  <div className="animate-pulse">
+    <div className="bg-gray-200 w-full h-52 rounded mb-3"></div>
+    <div className="h-3 bg-gray-200 rounded w-24 mb-2"></div>
+    <div className="h-5 bg-gray-300 rounded w-full mb-2"></div>
+    <div className="h-4 bg-gray-200 rounded w-full mb-1"></div>
+    <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+  </div>
+);
+
+const CategoryFilterSkeleton = () => (
+  <div className="flex overflow-x-auto space-x-4 py-4">
+    <div className="animate-pulse bg-gray-200 rounded-full h-9 w-24"></div>
+    <div className="animate-pulse bg-gray-200 rounded-full h-9 w-20"></div>
+    <div className="animate-pulse bg-gray-200 rounded-full h-9 w-28"></div>
+    <div className="animate-pulse bg-gray-200 rounded-full h-9 w-24"></div>
+    <div className="animate-pulse bg-gray-200 rounded-full h-9 w-32"></div>
+  </div>
+);
+
+// Main content component
+const ArticlesContent = async () => {
+  const posts: Post[] = await sanityClient.fetch(postsQuery);
+  const categories: Category[] = await sanityClient.fetch(categoriesQuery);
+
+  // Organize articles
+  const featuredArticles = posts.slice(0, 4);
+  const remainingArticles = posts.slice(4);
+
+  return (
+    <>
+      <section className="container mx-auto px-4 py-8">
+        <h1 className="text-3xl font-bold mb-6 flex items-center">
+          <span className="inline-block w-2 h-8 bg-red-600 mr-3"></span>
+          Tous les articles
+        </h1>
+
+        {/* Category filters */}
+        <div className="border-y border-gray-200 py-4 mb-8">
+          <div className="flex overflow-x-auto space-x-4 scrollbar-hide py-1">
+            <Link
+              href="/articles"
+              className="whitespace-nowrap px-4 py-2 rounded-full bg-red-600 text-white text-sm font-medium"
+            >
+              Tous les articles
+            </Link>
+            {categories.map((category) => (
+              <Link
+                href={`/rubriques/${category.slug.current}`}
+                key={category._id}
+                className="whitespace-nowrap px-4 py-2 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-800 text-sm font-medium"
+              >
+                {category.title}
+              </Link>
+            ))}
+          </div>
+        </div>
+
+        {/* Featured Articles */}
+        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+          {featuredArticles.map((article) => (
+            <Link
+              href={`/articles/${article.slug.current}`}
+              key={article._id}
+              className="group flex flex-col h-full"
+            >
+              <div className="relative w-full h-48 overflow-hidden rounded-lg mb-3">
+                {article.mainImage && (
+                  <Image
+                    src={urlForImage(article.mainImage).width(500).height(300).url()}
+                    alt={article.title}
+                    fill
+                    className="object-cover transition-transform duration-300 group-hover:scale-105"
+                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                  />
+                )}
+                {article.categories && article.categories[0] && (
+                  <div className="absolute top-3 left-3 bg-red-600 text-white text-xs px-2 py-1 rounded">
+                    {article.categories[0].title}
+                  </div>
+                )}
+              </div>
+              <div className="flex-1 flex flex-col">
+                <div className="text-xs text-gray-500 mb-2">
+                  {new Date(article.publishedAt).toLocaleDateString("fr-FR")}
+                </div>
+                <h3 className="font-bold text-lg mb-2 group-hover:text-red-600 line-clamp-2">
+                  {article.title}
+                </h3>
+                <p className="text-gray-600 text-sm line-clamp-3 mb-3">{article.excerpt}</p>
+                <div className="mt-auto flex items-center">
+                  {article.author?.image && (
+                    <div className="w-6 h-6 rounded-full overflow-hidden mr-2">
+                      <Image
+                        src={urlForImage(article.author.image).width(50).height(50).url()}
+                        alt={article.author.name}
+                        width={24}
+                        height={24}
+                        className="object-cover"
+                      />
+                    </div>
+                  )}
+                  <span className="text-xs text-gray-500">
+                    Par {article.author?.name || "Rédaction"}
+                  </span>
+                </div>
+              </div>
+            </Link>
+          ))}
+        </div>
+
+        {/* Article list */}
+        <div className="grid md:grid-cols-2 gap-8">
+          <div className="space-y-6">
+            {remainingArticles.filter((_, i) => i % 2 === 0).map((article) => (
+              <Link
+                href={`/articles/${article.slug.current}`}
+                key={article._id}
+                className="flex gap-4 group p-2 hover:bg-gray-50 rounded-lg"
+              >
+                {article.mainImage && (
+                  <div className="relative w-32 h-24 flex-shrink-0 overflow-hidden rounded">
+                    <Image
+                      src={urlForImage(article.mainImage).width(200).height(150).url()}
+                      alt={article.title}
+                      fill
+                      className="object-cover"
+                      sizes="128px"
+                    />
+                  </div>
+                )}
+                <div className="flex-1">
+                  <div className="text-xs text-gray-500 mb-1">
+                    {article.categories && article.categories[0] ? (
+                      <span className="text-red-600 mr-2">{article.categories[0].title}</span>
+                    ) : null}
+                    {new Date(article.publishedAt).toLocaleDateString("fr-FR")}
+                  </div>
+                  <h3 className="font-medium text-lg mb-1 line-clamp-2 group-hover:text-red-600">
+                    {article.title}
+                  </h3>
+                  <p className="text-sm text-gray-600 line-clamp-2">{article.excerpt}</p>
+                </div>
+              </Link>
+            ))}
+          </div>
+          <div className="space-y-6">
+            {remainingArticles.filter((_, i) => i % 2 === 1).map((article) => (
+              <Link
+                href={`/articles/${article.slug.current}`}
+                key={article._id}
+                className="flex gap-4 group p-2 hover:bg-gray-50 rounded-lg"
+              >
+                {article.mainImage && (
+                  <div className="relative w-32 h-24 flex-shrink-0 overflow-hidden rounded">
+                    <Image
+                      src={urlForImage(article.mainImage).width(200).height(150).url()}
+                      alt={article.title}
+                      fill
+                      className="object-cover"
+                      sizes="128px"
+                    />
+                  </div>
+                )}
+                <div className="flex-1">
+                  <div className="text-xs text-gray-500 mb-1">
+                    {article.categories && article.categories[0] ? (
+                      <span className="text-red-600 mr-2">{article.categories[0].title}</span>
+                    ) : null}
+                    {new Date(article.publishedAt).toLocaleDateString("fr-FR")}
+                  </div>
+                  <h3 className="font-medium text-lg mb-1 line-clamp-2 group-hover:text-red-600">
+                    {article.title}
+                  </h3>
+                  <p className="text-sm text-gray-600 line-clamp-2">{article.excerpt}</p>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </div>
+
+        {/* Pagination placeholder */}
+        <div className="flex justify-center mt-12">
+          <div className="flex items-center gap-1">
+            <button className="px-4 py-2 bg-gray-200 rounded">Précédent</button>
+            <button className="px-4 py-2 bg-red-600 text-white rounded">1</button>
+            <button className="px-4 py-2 bg-gray-200 rounded">2</button>
+            <button className="px-4 py-2 bg-gray-200 rounded">3</button>
+            <button className="px-4 py-2 bg-gray-200 rounded">Suivant</button>
+          </div>
+        </div>
+      </section>
+
+      {/* Newsletter */}
+      <section className="bg-gray-100 py-10 mt-12">
+        <div className="container mx-auto px-4">
+          <div className="max-w-xl mx-auto text-center">
+            <h3 className="text-2xl font-bold mb-4">Restez informé</h3>
+            <p className="text-gray-600 mb-6">
+              Abonnez-vous à notre newsletter hebdomadaire et recevez les dernières informations
+              directement dans votre boîte mail
+            </p>
+            <form className="flex flex-col sm:flex-row gap-2">
+              <input
+                type="email"
+                placeholder="Votre adresse email"
+                className="flex-grow px-4 py-3 rounded-lg border focus:outline-none focus:ring-2 focus:ring-red-600"
+                required
+              />
+              <button
+                type="submit"
+                className="bg-red-600 text-white font-medium px-6 py-3 rounded-lg hover:bg-red-700 transition"
+              >
+                S'abonner
+              </button>
+            </form>
+            <p className="text-xs text-gray-500 mt-3">
+              En vous inscrivant, vous acceptez notre politique de confidentialité
+            </p>
+          </div>
+        </div>
+      </section>
+    </>
+  );
+};
+
+// Skeleton component for loading state
+const ArticlesSkeleton = () => (
+  <>
+    <section className="container mx-auto px-4 py-8">
+      <div className="animate-pulse h-10 bg-gray-200 w-64 mb-6 rounded"></div>
+
+      {/* Category filters skeleton */}
+      <div className="border-y border-gray-200 py-4 mb-8">
+        <CategoryFilterSkeleton />
+      </div>
+
+      {/* Featured Articles skeleton */}
+      <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+        <GridArticleSkeleton />
+        <GridArticleSkeleton />
+        <GridArticleSkeleton />
+        <GridArticleSkeleton />
+      </div>
+
+      {/* Article list skeleton */}
+      <div className="grid md:grid-cols-2 gap-8">
+        <div className="space-y-6">
+          <ArticleSkeleton />
+          <ArticleSkeleton />
+          <ArticleSkeleton />
+          <ArticleSkeleton />
+          <ArticleSkeleton />
+        </div>
+        <div className="space-y-6">
+          <ArticleSkeleton />
+          <ArticleSkeleton />
+          <ArticleSkeleton />
+          <ArticleSkeleton />
+          <ArticleSkeleton />
+        </div>
+      </div>
+
+      {/* Pagination skeleton */}
+      <div className="flex justify-center mt-12">
+        <div className="animate-pulse flex items-center gap-1">
+          <div className="h-10 w-24 bg-gray-200 rounded"></div>
+          <div className="h-10 w-10 bg-gray-300 rounded"></div>
+          <div className="h-10 w-10 bg-gray-200 rounded"></div>
+          <div className="h-10 w-10 bg-gray-200 rounded"></div>
+          <div className="h-10 w-24 bg-gray-200 rounded"></div>
+        </div>
+      </div>
+    </section>
+  </>
+);
+
+export default function Articles() {
+  return (
+    <div className="min-h-screen flex flex-col bg-white">
+      <main className="flex-1">
+        <Suspense fallback={<ArticlesSkeleton />}>
+          <ArticlesContent />
+        </Suspense>
+      </main>
+    </div>
+  );
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+import Image from "next/image";
+import Link from "next/link";
+import { ArrowLeft, Bookmark, Calendar, ChevronRight, Clock, Share2, User } from "lucide-react";
+import { Suspense } from "react";
+import { sanityClient } from "@/lib/sanity";
+import { urlForImage } from "@/lib/sanity.image";
+import { PortableText } from "next-sanity";
+import { postBySlugQuery, postsQuery } from "@/lib/querie";
+import { Post } from "@/types/post";
+import { notFound } from "next/navigation";
+
+// Define the props type for the dynamic route
+type PageProps = {
+  params: Promise<{ slug: string }>;
+};
+
+// Skeleton component for article loading state
+const ArticleSkeleton = () => (
+  <div className="animate-pulse max-w-4xl mx-auto">
+    <div className="h-8 bg-gray-200 rounded w-3/4 mb-4"></div>
+    <div className="h-4 bg-gray-200 rounded w-1/4 mb-6"></div>
+    <div className="bg-gray-200 w-full h-96 rounded-lg mb-8"></div>
+    <div className="space-y-3">
+      <div className="h-4 bg-gray-200 rounded w-full"></div>
+      <div className="h-4 bg-gray-200 rounded w-full"></div>
+      <div className="h-4 bg-gray-200 rounded w-11/12"></div>
+      <div className="h-4 bg-gray-200 rounded w-full"></div>
+      <div className="h-4 bg-gray-200 rounded w-4/5"></div>
+    </div>
+    <div className="mt-8 h-px bg-gray-200"></div>
+    <div className="mt-8">
+      <div className="h-6 bg-gray-200 rounded w-1/3 mb-4"></div>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="flex gap-3">
+          <div className="w-20 h-16 bg-gray-200 rounded"></div>
+          <div>
+            <div className="h-4 bg-gray-200 rounded w-full mb-2"></div>
+            <div className="h-3 bg-gray-200 rounded w-1/2"></div>
+          </div>
+        </div>
+        <div className="flex gap-3">
+          <div className="w-20 h-16 bg-gray-200 rounded"></div>
+          <div>
+            <div className="h-4 bg-gray-200 rounded w-full mb-2"></div>
+            <div className="h-3 bg-gray-200 rounded w-1/2"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+);
+
+// Main content component
+const ArticleContent = async ({ params }: { params: Promise<{ slug: string }> }) => {
+  const { slug } = await params;
+  const post: Post = await sanityClient.fetch(postBySlugQuery, { slug });
+
+  // Handle case where post is not found
+  if (!post) {
+    notFound();
+  }
+
+  // Fetch related posts based on categories
+  let relatedPosts: Post[] = [];
+  if (post.categories && post.categories.length > 0) {
+    const categoryIds = post.categories.map((cat) => cat._id);
+    const allPosts: Post[] = await sanityClient.fetch(postsQuery);
+    relatedPosts = allPosts
+      .filter(
+        (p) =>
+          p._id !== post._id &&
+          p.categories?.some((cat) => categoryIds.includes(cat._id))
+      )
+      .slice(0, 3);
+  }
+
+  // Fetch recent posts excluding the current post
+  const allPosts: Post[] = await sanityClient.fetch(postsQuery);
+  const recentPosts = allPosts.filter((p) => p._id !== post._id).slice(0, 4);
+
+  const formattedDate = new Date(post.publishedAt).toLocaleDateString("fr-FR", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
+
+  const estimatedReadingTime = post.body
+    ? Math.ceil(
+        post.body.reduce(
+          (count, block) =>
+            block.children
+              ? count +
+                block.children.reduce(
+                  (sum, child) => sum + (child.text ? child.text.split(" ").length : 0),
+                  0
+                )
+              : count,
+          0
+        ) / 200
+      )
+    : 5; // 200 words per minute average
+
+  return (
+    <div className="min-h-screen bg-white">
+      {/* Hero Image with overlay */}
+      {post.mainImage && (
+        <div className="relative w-full h-[40vh] md:h-[60vh]">
+          <Image
+            src={urlForImage(post.mainImage).width(1920).height(1080).url()}
+            alt={post.title}
+            fill
+            className="object-cover"
+            sizes="100vw"
+          />
+          <div className="absolute inset-0 bg-primary/30" />
+        </div>
+      )}
+
+      <div className="container mx-auto px-4 relative">
+        {/* Main article card */}
+        <div className="bg-white p-6 md:p-10 max-w-4xl mx-auto shadow-lg rounded-lg -mt-20 relative z-10">
+          {/* Back navigation */}
+          <div className="flex items-center text-sm text-gray-600 mb-6">
+            <Link
+              href="/"
+              className="flex items-center gap-2 hover:text-red-600 transition-colors"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              Retour à l'accueil
+            </Link>
+          </div>
+
+          {/* Category and metadata */}
+          <div className="flex flex-wrap items-center gap-4 mb-4">
+            {post.categories && post.categories[0] && (
+              <Link
+                href={`/rubriques/${post.categories[0].slug.current}`}
+                className="bg-primary text-white px-3 py-1 rounded-full text-sm font-medium hover:bg-red-600 transition-colors"
+              >
+                {post.categories[0].title}
+              </Link>
+            )}
+            <span className="flex items-center gap-1 text-gray-600 text-sm">
+              <Calendar className="w-4 h-4" />
+              {formattedDate}
+            </span>
+            <span className="flex items-center gap-1 text-gray-600 text-sm">
+              <Clock className="w-4 h-4" />
+              {estimatedReadingTime} min de lecture
+            </span>
+          </div>
+
+          {/* Article title */}
+          <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-6">
+            {post.title}
+          </h1>
+
+          {/* Author and actions */}
+          <div className="flex items-center justify-between pb-6 border-b border-gray-200">
+            <div className="flex items-center gap-3">
+              {post.author?.image ? (
+                <div className="w-10 h-10 rounded-full overflow-hidden">
+                  <Image
+                    src={urlForImage(post.author.image).width(100).height(100).url()}
+                    alt={post.author.name}
+                    width={40}
+                    height={40}
+                    className="object-cover"
+                  />
+                </div>
+              ) : (
+                <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center">
+                  <User className="w-5 h-5 text-gray-500" />
+                </div>
+              )}
+              <span className="font-medium">{post.author?.name || "Rédaction"}</span>
+            </div>
+
+            <div className="flex items-center gap-3">
+              <button className="p-2 rounded-full hover:bg-gray-100 flex items-center gap-1 text-gray-600 text-sm">
+                <Share2 className="w-5 h-5" />
+                Partager
+              </button>
+              <button className="p-2 rounded-full hover:bg-gray-100 flex items-center gap-1 text-gray-600 text-sm">
+                <Bookmark className="w-5 h-5" />
+                Sauvegarder
+              </button>
+            </div>
+          </div>
+
+          {/* Article body */}
+          <div className="prose max-w-none py-8">
+            {post.body && <PortableText value={post.body} />}
+          </div>
+
+          {/* YouTube Video (if available) */}
+          {post.youtubeUrl && (
+            <div className="relative w-full aspect-video my-8 rounded-lg overflow-hidden shadow-md">
+              <iframe
+                className="absolute top-0 left-0 w-full h-full"
+                src={`https://www.youtube.com/embed/${
+                  post.youtubeUrl.split("v=")[1] || ""
+                }`}
+                title="YouTube video player"
+                frameBorder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+              ></iframe>
+            </div>
+          )}
+
+          {/* Tags/Categories */}
+          {post.categories && post.categories.length > 0 && (
+            <div className="pt-6 border-t border-gray-200">
+              <h4 className="text-sm font-medium text-gray-500 mb-3">Thématiques</h4>
+              <div className="flex flex-wrap gap-2">
+                {post.categories.map((category) => (
+                  <Link
+                    href={`/rubriques/${category.slug.current}`}
+                    key={category._id}
+                    className="bg-gray-100 hover:bg-gray-200 text-gray-800 text-sm px-3 py-1 rounded-full transition-colors"
+                  >
+                    {category.title}
+                  </Link>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Related Articles */}
+        {relatedPosts.length > 0 && (
+          <div className="max-w-4xl mx-auto mt-16">
+            <h2 className="text-2xl font-bold mb-8 flex items-center">
+              <span className="inline-block w-2 h-6 bg-red-600 mr-3"></span>
+              Articles similaires
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              {relatedPosts.map((article) => (
+                <Link
+                  href={`/articles/${article.slug.current}`}
+                  key={article._id}
+                  className="group"
+                >
+                  <div className="overflow-hidden rounded-lg shadow-md">
+                    <div className="relative w-full h-48 overflow-hidden">
+                      {article.mainImage ? (
+                        <Image
+                          src={urlForImage(article.mainImage).width(400).height(300).url()}
+                          alt={article.title}
+                          fill
+                          className="object-cover transition-transform duration-300 group-hover:scale-105"
+                          sizes="(max-width: 768px) 100vw, 300px"
+                        />
+                      ) : (
+                        <div className="w-full h-full bg-gray-200 flex items-center justify-center">
+                          <span className="text-gray-400">Image non disponible</span>
+                        </div>
+                      )}
+                      {article.categories && article.categories[0] && (
+                        <div className="absolute bottom-0 left-0 m-3">
+                          <span className="bg-primary bg-opacity-70 text-white text-xs px-2 py-1 rounded">
+                            {article.categories[0].title}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                    <div className="p-4">
+                      <h3 className="font-bold line-clamp-2 group-hover:text-red-600 transition-colors">
+                        {article.title}
+                      </h3>
+                      <div className="flex items-center mt-3 text-xs text-gray-500">
+                        <Calendar className="w-3 h-3 mr-1" />
+                        {new Date(article.publishedAt).toLocaleDateString("fr-FR")}
+                      </div>
+                    </div>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Recent Articles */}
+        <div className="max-w-4xl mx-auto mt-16 mb-16">
+          <h2 className="text-2xl font-bold mb-8 flex items-center">
+            <span className="inline-block w-2 h-6 bg-red-600 mr-3"></span>
+            À ne pas manquer
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {recentPosts.map((article) => (
+              <Link
+                href={`/articles/${article.slug.current}`}
+                key={article._id}
+                className="flex gap-4 group p-3 hover:bg-gray-50 rounded-lg transition-colors"
+              >
+                {article.mainImage ? (
+                  <div className="relative w-28 h-24 flex-shrink-0 overflow-hidden rounded-md shadow-sm">
+                    <Image
+                      src={urlForImage(article.mainImage).width(200).height(150).url()}
+                      alt={article.title}
+                      fill
+                      className="object-cover"
+                      sizes="100px"
+                    />
+                  </div>
+                ) : (
+                  <div className="w-28 h-24 bg-gray-200 flex-shrink-0 rounded-md flex items-center justify-center">
+                    <span className="text-gray-400 text-xs">Pas d'image</span>
+                  </div>
+                )}
+                <div className="flex-1">
+                  <div className="flex items-center text-xs text-gray-500 mb-1">
+                    {article.categories && article.categories[0] ? (
+                      <span className="text-red-600 mr-2 font-medium">
+                        {article.categories[0].title}
+                      </span>
+                    ) : null}
+                    <span className="flex items-center">
+                      <Calendar className="w-3 h-3 mr-1" />
+                      {new Date(article.publishedAt).toLocaleDateString("fr-FR")}
+                    </span>
+                  </div>
+                  <h3 className="font-medium line-clamp-2 group-hover:text-red-600 transition-colors">
+                    {article.title}
+                  </h3>
+                </div>
+              </Link>
+            ))}
+          </div>
+          <div className="text-center mt-10">
+            <Link
+              href="/articles"
+              className="inline-block bg-red-600 text-white px-8 py-3 rounded-lg hover:bg-red-700 transition-colors font-medium"
+            >
+              Voir tous les articles
+            </Link>
+          </div>
+        </div>
+
+        {/* Newsletter */}
+        <div className="max-w-4xl mx-auto mb-16 py-12 px-8 bg-gray-50 rounded-xl shadow-sm">
+          <div className="max-w-xl mx-auto text-center">
+            <h3 className="text-2xl font-bold mb-4">Restez informé</h3>
+            <p className="text-gray-600 mb-6">
+              Abonnez-vous à notre newsletter hebdomadaire et recevez les dernières informations
+              directement dans votre boîte mail
+            </p>
+            <form className="flex flex-col sm:flex-row gap-3">
+              <input
+                type="email"
+                placeholder="Votre adresse email"
+                className="flex-grow px-4 py-3 rounded-lg border focus:outline-none focus:ring-2 focus:ring-red-600 transition-all"
+                required
+              />
+              <button
+                type="submit"
+                className="bg-red-600 text-white font-medium px-6 py-3 rounded-lg hover:bg-red-700 transition-colors shadow-sm"
+              >
+                S'abonner
+              </button>
+            </form>
+            <p className="text-xs text-gray-500 mt-4">
+              En vous inscrivant, vous acceptez notre politique de confidentialité
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// Generate static parameters for the dynamic route
+export async function generateStaticParams() {
+  const posts: Post[] = await sanityClient.fetch(`*[_type == "post"]{ slug }`);
+  return posts.map((post) => ({
+    slug: post.slug.current,
+  }));
+}
+
+export default async function ArticlePage({ params }: PageProps) {
+  return (
+    <div className="min-h-screen flex flex-col bg-white">
+      <main className="flex-1">
+        <Suspense
+          fallback={
+            <div className="container mx-auto px-4 py-8">
+              <ArticleSkeleton />
+            </div>
+          }
+        >
+          <ArticleContent params={params} />
+        </Suspense>
+      </main>
+    </div>
+  );
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// 'use client'
+// import React, { useState, useEffect } from 'react';
+// import { Search, Menu, X, ChevronDown, Zap, Sparkles } from 'lucide-react';
+// import Image from 'next/image';
+
+
+// const DynamicNavbar = () => {
+//   const [isMenuOpen, setIsMenuOpen] = useState(false);
+//   const [scrolled, setScrolled] = useState(false);
+//   const [isSearchOpen, setIsSearchOpen] = useState(false);
+//   const [searchQuery, setSearchQuery] = useState('');
+//   const [activeDropdown, setActiveDropdown] = useState(null);
+//   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+//   const [isLoading, setIsLoading] = useState(false);
+
+//   useEffect(() => {
+//     const handleScroll = () => {
+//       const scrollY = window.scrollY;
+//       setScrolled(scrollY > 20);
+//     };
+
+//     const handleMouseMove = (e :any) => {
+//       setMousePosition({ x: e.clientX, y: e.clientY });
+//     };
+
+//     window.addEventListener('scroll', handleScroll);
+//     window.addEventListener('mousemove', handleMouseMove);
+    
+//     return () => {
+//       window.removeEventListener('scroll', handleScroll);
+//       window.removeEventListener('mousemove', handleMouseMove);
+//     };
+//   }, []);
+
+//   const navLinks = [
+//     { 
+//       name: 'Articles', 
+//       href: '/articles',
+//     },
+//     { 
+//       name: 'Rubriques', 
+//       href: '/rubriques',
+//     },
+//     { name: 'Contact', href: '/contact' },
+//     { name: 'À propos', href: '/a-propos' },
+//   ];
+
+//   const handleSearch = (e : any) => {
+//     if (e) e.preventDefault();
+//     if (searchQuery.trim()) {
+//       setIsLoading(true);
+//       // Simulation de recherche
+//       setTimeout(() => {
+//         setIsLoading(false);
+//         setIsSearchOpen(false);
+//         setSearchQuery('');
+//         console.log('Recherche:', searchQuery);
+//       }, 1500);
+//     }
+//   };
+
+//   return (
+//     <>
+//       {/* Curseur personnalisé */}
+//       <div 
+//         className="fixed w-4 h-4 bg-primary/20 rounded-full pointer-events-none z-[100] transition-all duration-300 mix-blend-difference"
+//         style={{
+//           left: mousePosition.x - 8,
+//           top: mousePosition.y - 8,
+//           transform: isMenuOpen ? 'scale(2)' : 'scale(1)'
+//         }}
+//       />
+
+//       <header className={`fixed w-full top-0 z-50 transition-all duration-700 ${
+//         scrolled ? 'py-2' : 'py-4'
+//       } ${scrolled ? 'bg-white/90 backdrop-blur-xl shadow-2xl border-b border-black/5' : 'bg-gradient-to-r from-white via-gray-50/80 to-white'}`}>
+        
+//         {/* Particules flottantes */}
+//         <div className="absolute inset-0 overflow-hidden pointer-events-none">
+//           {[...Array(6)].map((_, i) => (
+//             <div
+//               key={i}
+//               className="absolute w-1 h-1 bg-primary/10 rounded-full animate-pulse"
+//               style={{
+//                 left: `${20 + i * 15}%`,
+//                 top: `${30 + (i % 3) * 20}%`,
+//                 animationDelay: `${i * 0.5}s`,
+//                 animationDuration: `${2 + i * 0.3}s`
+//               }}
+//             />
+//           ))}
+//         </div>
+
+//         <div className="container mx-auto px-4 relative">
+//           <nav className="flex items-center justify-between">
+            
+//             {/* Logo avec effet holographique */}
+//            a
+
+//             {/* Navigation Desktop */}
+//             <div className="hidden md:flex items-center space-x-2">
+//               {navLinks.map((link, index) => (
+//                 <div
+//                   key={link.href}
+//                   className="relative group"
+//                   // onMouseEnter={() => setActiveDropdown(link.dropdown ? index : null)}
+//                   onMouseLeave={() => setActiveDropdown(null)}
+//                 >
+//                   <button className="group/btn relative px-6 py-3 rounded-full overflow-hidden">
+//                     {/* Effet de fond animé */}
+//                     {/* <div className="absolute inset-0 bg-gradient-to-r from-purple-500/0 via-black/0 to-cyan-500/0 group-hover/btn:from-purple-500/10 group-hover/btn:via-black/10 group-hover/btn:to-cyan-500/10 transition-all duration-500"></div> */}
+                    
+//                     {/* Bordure animée */}
+//                     {/* <div className="absolute inset-0 border border-transparent group-hover/btn:border-black/20 rounded-full transition-all duration-300"></div> */}
+                    
+//                     <div className="flex items-center gap-2 relative z-10">
+//                       <span className="text-gray-700 group-hover/btn:text-primary transition-all duration-300 font-medium">
+//                         {link.name}
+//                       </span>
+                     
+//                     </div>
+
+//                     {/* Effet de brillance */}
+//                     <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent -translate-x-full group-hover/btn:translate-x-full transition-transform duration-700"></div>
+//                   </button>
+
+               
+                 
+//                 </div>
+//               ))}
+//             </div>
+
+//             {/* Recherche et Menu Mobile */}
+//             <div className="flex items-center gap-4">
+              
+//               {/* Bouton de recherche */}
+//               <div className="relative">
+//                 <button
+//                   onClick={() => setIsSearchOpen(!isSearchOpen)}
+//                   className="relative p-3 group rounded-full overflow-hidden"
+//                   aria-label="Search"
+//                 >
+//                   <div className="absolute inset-0 bg-gradient-to-r from-purple-500/0 to-black/0 group-hover:from-purple-500/20 group-hover:to-black/20 transition-all duration-500"></div>
+//                   <Search className={`w-5 h-5 relative z-10 transition-all duration-300 ${
+//                     isSearchOpen ? 'text-blue-600 rotate-90' : 'text-gray-600 group-hover:text-primary'
+//                   }`} />
+//                   <div className="absolute inset-0 border border-transparent group-hover:border-black/20 rounded-full transition-all duration-300"></div>
+//                 </button>
+
+//                 {/* Modal de recherche */}
+//                 {isSearchOpen && (
+//                   <div className="absolute right-0 top-full mt-4 w-96">
+//                     <div className="bg-white/95 backdrop-blur-xl rounded-3xl shadow-2xl border border-black/10 overflow-hidden">
+//                       <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 via-black/5 to-cyan-500/5"></div>
+                      
+//                       <div className="relative p-6">
+//                         <div className="relative">
+//                           <input
+//                             type="text"
+//                             value={searchQuery}
+//                             onChange={(e) => setSearchQuery(e.target.value)}
+//                             onKeyPress={(e) => e.key === 'Enter' && handleSearch(e)}
+//                             placeholder="Rechercher des articles..."
+//                             className="w-full pl-6 pr-16 py-4 bg-white/80 border-2 border-gray-200 focus:border-black rounded-2xl outline-none transition-all duration-300 text-gray-800 placeholder-gray-500"
+//                           />
+                          
+//                           <div className="absolute right-2 top-2 flex items-center gap-2">
+//                             <button 
+//                               onClick={handleSearch}
+//                               disabled={isLoading}
+//                               className="p-2 bg-gradient-to-r from-purple-500 to-black text-white rounded-xl hover:shadow-lg transition-all duration-300 disabled:opacity-50"
+//                             >
+//                               {isLoading ? (
+//                                 <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+//                               ) : (
+//                                 <Search className="w-4 h-4" />
+//                               )}
+//                             </button>
+//                             <button 
+//                               onClick={() => setIsSearchOpen(false)}
+//                               className="p-2 hover:bg-gray-100 rounded-xl transition-colors duration-300"
+//                             >
+//                               <X className="w-4 h-4" />
+//                             </button>
+//                           </div>
+//                         </div>
+
+//                         {/* Suggestions */}
+//                         <div className="mt-4 space-y-2">
+//                           <p className="text-sm text-gray-500 mb-2">Suggestions populaires:</p>
+//                           {['Technologie', 'Actualités', 'Sport'].map((suggestion) => (
+//                             <button
+//                               key={suggestion}
+//                               onClick={() => setSearchQuery(suggestion)}
+//                               className="inline-block px-3 py-1 bg-gray-100 hover:bg-gradient-to-r hover:from-purple-100 hover:to-blue-100 text-gray-700 rounded-full text-sm transition-all duration-300 mr-2"
+//                             >
+//                               {suggestion}
+//                             </button>
+//                           ))}
+//                         </div>
+//                       </div>
+//                     </div>
+//                   </div>
+//                 )}
+//               </div>
+
+//               {/* Bouton Menu Mobile */}
+//               <button
+//                 onClick={() => setIsMenuOpen(!isMenuOpen)}
+//                 className="md:hidden relative p-3 group rounded-full overflow-hidden"
+//               >
+//                 <div className="absolute inset-0 bg-gradient-to-r from-red-500/0 to-orange-500/0 group-hover:from-red-500/20 group-hover:to-orange-500/20 transition-all duration-500"></div>
+//                 <div className="relative z-10">
+//                   {isMenuOpen ? (
+//                     <X className="w-6 h-6 text-red-600 rotate-90 transition-all duration-300" />
+//                   ) : (
+//                     <Menu className="w-6 h-6 text-gray-600 group-hover:text-primary transition-all duration-300" />
+//                   )}
+//                 </div>
+//               </button>
+//             </div>
+//           </nav>
+
+//           {/* Menu Mobile */}
+//           <div className={`md:hidden fixed inset-0 bg-primary/50 backdrop-blur-md transition-all duration-500 ${
+//             isMenuOpen ? 'opacity-100 visible' : 'opacity-0 invisible'
+//           }`}>
+//             <div className={`absolute right-0 top-0 h-full w-80 bg-white/95 backdrop-blur-xl transition-transform duration-500 ${
+//               isMenuOpen ? 'translate-x-0' : 'translate-x-full'
+//             }`}>
+//               <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 via-black/5 to-cyan-500/5"></div>
+              
+//               <div className="relative h-full flex flex-col pt-24 px-8 space-y-6">
+//                 <div className="flex items-center gap-3 mb-8">
+//                   <Sparkles className="w-6 h-6 text-purple-600" />
+//                   <span className="text-xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
+//                     Menu
+//                   </span>
+//                 </div>
+
+//                 {navLinks.map((link, index) => (
+//                   <div key={link.href} className="group">
+//                     <a
+//                       href={link.href}
+//                       onClick={() => setIsMenuOpen(false)}
+//                       className="flex items-center text-xl font-medium text-gray-800 group-hover:text-primary transition-all duration-300"
+//                       style={{ animationDelay: `${index * 100}ms` }}
+//                     >
+//                       <div className="w-0 h-0.5 bg-gradient-to-r from-purple-500 to-black group-hover:w-8 transition-all duration-500 mr-0 group-hover:mr-4 rounded-full"></div>
+//                       <span className="group-hover:translate-x-2 transition-transform duration-300">
+//                         {link.name}
+//                       </span>
+//                     </a>
+//                   </div>
+//                 ))}
+
+//                 {/* Effet de particules dans le menu */}
+//                 <div className="absolute bottom-10 left-8 right-8">
+//                   <div className="h-px bg-gradient-to-r from-transparent via-purple-500/50 to-transparent"></div>
+//                   <div className="flex justify-center mt-6">
+//                     <div className="w-16 h-16 bg-gradient-to-r from-purple-500/20 to-black/20 rounded-full flex items-center justify-center">
+//                       <div className="w-8 h-8 bg-gradient-to-r from-purple-500 to-black rounded-full animate-pulse"></div>
+//                     </div>
+//                   </div>
+//                 </div>
+//               </div>
+//             </div>
+//           </div>
+//         </div>
+
+//         {/* Barre de progression animée */}
+       
+//       </header>
+//     </>
+//   );
+// };
+
+// export default DynamicNavbar;
+
+
+
+// 'use client'
+// import React, { useState, useEffect } from 'react';
+// import { Search, Menu, X } from 'lucide-react';
+// import Image from 'next/image';
+
+// const SearchBar = () => {
+//   const [isSearchOpen, setIsSearchOpen] = useState(false);
+  
+//   return (
+//     <div className="relative">
+//       {isSearchOpen ? (
+//         <div className="flex items-center animate-fadeIn">
+//           <input
+//             type="text"
+//             placeholder="Rechercher..."
+//             className="bg-primary border border-white/30 py-2 px-4 rounded-full text-sm text-white placeholder-white/70 focus:outline-none focus:ring-2 focus:ring-white/50 focus:bg-white/20 transition-all duration-300 w-48"
+//             autoFocus
+//           />
+//           <button 
+//             onClick={() => setIsSearchOpen(false)}
+//             className="ml-3 text-white/70 hover:text-white hover:scale-110 transition-all duration-300 p-1 rounded-full hover:bg-white/10"
+//           >
+//             <X size={20} />
+//           </button>
+//         </div>
+//       ) : (
+//         <button 
+//           onClick={() => setIsSearchOpen(true)}
+//           className="group relative p-2 text-white/80 hover:text-white hover:scale-110 transition-all duration-300 rounded-full hover:bg-white/10"
+//         >
+//           <Search size={20} />
+//           <div className="absolute inset-0 rounded-full bg-white opacity-0 group-hover:opacity-10 group-hover:animate-ping"></div>
+//         </button>
+//       )}
+//     </div>
+//   );
+// };
+
+// const Navbar = () => {
+//   const [isMenuOpen, setIsMenuOpen] = useState(false);
+//   const [isScrolled, setIsScrolled] = useState(false);
+//   const [isVisible, setIsVisible] = useState(false);
+  
+//   useEffect(() => {
+//     // Animation d'apparition
+//     const timer = setTimeout(() => setIsVisible(true), 100);
+    
+//     // Détection du scroll
+//     const handleScroll = () => {
+//       setIsScrolled(window.scrollY > 20);
+//     };
+    
+//     window.addEventListener('scroll', handleScroll);
+    
+//     return () => {
+//       clearTimeout(timer);
+//       window.removeEventListener('scroll', handleScroll);
+//     };
+//   }, []);
+
+//   const navLinks = [
+//     { href: "/articles", text: "Articles" },
+//     { href: "/rubriques", text: "Rubriques" },
+//     { href: "/contact", text: "Contact" },
+//     { href: "/a-propos", text: "À propos" }
+//   ];
+  
+//   return (
+//     <header className={`fixed top-0 w-full z-50 transition-all duration-500 ${
+//       isScrolled 
+//         ? 'bg-primary shadow-2xl border-b border-white/10' 
+//         : 'bg-primary'
+//     }`}>
+//       {/* Decorative top border */}
+//       <div className="h-1 bg-gradient-to-r from-transparent via-white to-transparent opacity-50"></div>
+      
+//       <div className="container mx-auto px-4">
+//         <div className={`flex items-center justify-between py-4 transform transition-all duration-1000 ${
+//           isVisible ? 'translate-y-0 opacity-100' : '-translate-y-10 opacity-0'
+//         }`}>
+          
+//           {/* Logo Section */}
+//           <div className="flex items-center gap-3 group">
+//             <div className="relative">
+//               <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center transform group-hover:scale-110 transition-all duration-300 shadow-lg">
+//                 <span className="text-primary font-bold text-xl"> 
+//                      <Image
+//                 src="/logo_black.png"
+//                 alt="Logo"
+//                 width={50}
+//                 height={50}
+//                 className="transition-transform duration-500 group-hover:scale-110"
+//               />               
+//                 </span>
+//               </div>
+//               <div className="absolute inset-0 rounded-full bg-white opacity-0 group-hover:opacity-20 group-hover:animate-ping"></div>
+//             </div>
+//             <div className="hidden sm:block">
+//               <h1 className="text-white font-bold text-xl group-hover:text-gray-300 transition-colors duration-300">
+//                 Criquet Studio
+//               </h1>
+//               <p className="text-white/60 text-xs group-hover:text-white/80 transition-colors duration-300">
+//                 Le média du bien-être
+//               </p>
+//             </div>
+//           </div>
+          
+//           {/* Desktop Navigation */}
+//           <nav className="hidden md:flex items-center gap-8">
+//             {navLinks.map((link, index) => (
+//               <a
+//                 key={index}
+//                 href={link.href}
+//                 className={`group relative text-white/80 hover:text-white font-medium transition-all duration-300 hover:-translate-y-0.5 transform transition-all duration-1000 delay-${(index + 1) * 100} ${
+//                   isVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'
+//                 }`}
+//               >
+//                 {link.text}
+//                 <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-white group-hover:w-full transition-all duration-300 rounded-full"></span>
+//                 <div className="absolute inset-0 rounded-lg bg-white opacity-0 group-hover:opacity-5 transition-opacity duration-300 -z-10 scale-110"></div>
+//               </a>
+//             ))}
+//           </nav>
+          
+//           {/* Right Section */}
+//           <div className="flex items-center gap-4">
+//             <SearchBar />
+            
+//             {/* Mobile Menu Button */}
+//             <button 
+//               className={`md:hidden group relative p-2 text-white/80 hover:text-white transition-all duration-300 rounded-full hover:bg-white/10 hover:scale-110 transform transition-all duration-1000 delay-500 ${
+//                 isVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'
+//               }`}
+//               onClick={() => setIsMenuOpen(!isMenuOpen)}
+//             >
+//               <div className="relative">
+//                 {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
+//               </div>
+//               <div className="absolute inset-0 rounded-full bg-white opacity-0 group-hover:opacity-10 group-hover:animate-ping"></div>
+//             </button>
+//           </div>
+//         </div>
+        
+//         {/* Mobile Menu */}
+//         <div className={`md:hidden overflow-hidden transition-all duration-500 ${
+//           isMenuOpen ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
+//         }`}>
+//           <div className="pb-4 border-t border-white/20 mt-4">
+//             <nav className="flex flex-col gap-2 pt-4">
+//               {navLinks.map((link, index) => (
+//                 <a
+//                   key={index}
+//                   href={link.href}
+//                   className={`group relative text-white/80 hover:text-white py-3 px-4 rounded-lg hover:bg-white/10 transition-all duration-300 hover:translate-x-2 transform transition-all duration-500 delay-${index * 100} ${
+//                     isMenuOpen ? 'translate-x-0 opacity-100' : '-translate-x-10 opacity-0'
+//                   }`}
+//                   onClick={() => setIsMenuOpen(false)}
+//                 >
+//                   <span className="w-0 h-0.5 bg-white group-hover:w-4 transition-all duration-300 mr-0 group-hover:mr-3 rounded-full inline-block"></span>
+//                   {link.text}
+//                 </a>
+//               ))}
+//             </nav>
+//           </div>
+//         </div>
+//       </div>
+
+//       {/* Bottom animated line */}
+//       <div className="absolute bottom-0 left-0 w-full h-px bg-white/20">
+//         <div className="h-full bg-gradient-to-r from-transparent via-white to-transparent opacity-30 animate-pulse"></div>
+//       </div>
+
+//       <style jsx>{`
+//         @keyframes fadeIn {
+//           from { opacity: 0; transform: translateY(-10px); }
+//           to { opacity: 1; transform: translateY(0); }
+//         }
+        
+//         .animate-fadeIn {
+//           animation: fadeIn 0.3s ease-out;
+//         }
+        
+//         .delay-100 { animation-delay: 100ms; }
+//         .delay-200 { animation-delay: 200ms; }
+//         .delay-300 { animation-delay: 300ms; }
+//         .delay-400 { animation-delay: 400ms; }
+//         .delay-500 { animation-delay: 500ms; }
+//       `}</style>
+//     </header>
+//   );
+// };
+
+// export default Navbar;

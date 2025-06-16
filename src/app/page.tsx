@@ -7,9 +7,9 @@ import { sanityClient } from "@/lib/sanity";
 import { Post, Category } from "@/types/post";
 import { urlForImage } from "@/lib/sanity.image";
 import NewsletterForm from "./components/NewsletterForm";
-import QuickSearch from "./components/QuickSearch";
 import Breadcrumb from "./components/Breadcrumb";
 import ShareButton from "./components/ShareButton";
+import CustomImage from '@/components/CustomImage'
 
 // ======================================================================
 // Sanity Queries (GROQ)
@@ -128,14 +128,11 @@ const HeroSection = ({
 
   return (
     <section className="container mx-auto px-4 py-8">
-      <div className="mb-6">
-        <QuickSearch />
-      </div>
       <div className="grid md:grid-cols-5 gap-8">
         <div className="md:col-span-3">
           <Link href={`/articles/${featuredArticle.slug.current}`} className="group">
             <div className="relative w-full h-96 overflow-hidden rounded-lg">
-              <Image
+              <CustomImage
                 src={imageUrl}
                 alt={featuredArticle.title || "Article mis en avant"}
                 fill
@@ -160,7 +157,7 @@ const HeroSection = ({
                       })}
                     </span>
                   </div>
-                  <h2 className="text-2xl font-bold mb-2 group-hover:text-red-400 transition-colors">
+                  <h2 className="text-2xl font-bold mb-2 group-hover:text-red-500 transition-colors">
                     <Link href={`/articles/${featuredArticle.slug.current}`} >{featuredArticle.title}</Link>
                   </h2>
                   <p className="text-sm opacity-90 line-clamp-2">{featuredArticle.excerpt}</p>
@@ -201,22 +198,16 @@ const HeroSection = ({
   );
 };
 
-const ArticleCard = ({
-  article,
-  variant = "vertical",
-}: {
-  article: Post;
-  variant?: "vertical" | "horizontal";
-}) => (
+const ArticleCard = ({ article, variant = "vertical" }: { article: Post; variant?: "vertical" | "horizontal" }) => (
   <Link
     href={`/articles/${article.slug.current}`}
-    className={`group ${variant === "horizontal" ? "flex gap-4 p-3 border-b" : "block"}`}
+    className={`group ${variant === "horizontal" ? "flex gap-4 p-3 border-b hover:border-red-600" : "block"}`}
   >
     {variant === "horizontal" ? (
       <>
         <div className="relative w-24 h-20 overflow-hidden rounded-md flex-shrink-0">
           {article.mainImage && (
-            <Image
+            <CustomImage
               src={urlForImage(article.mainImage).width(200).height(150).url()}
               alt={article.title}
               fill
@@ -276,7 +267,7 @@ const CategoriesSection = ({ categories }: { categories: Category[] }) => (
         <Link
           href="/articles"
           className="whitespace-nowrap px-4 py-2 rounded-full bg-red-600 text-white text-sm font-medium flex-shrink-0"
-          aria-label="Voir les articles à la une" // Added aria-label
+          aria-label="Voir les articles à la une"
         >
           À la une
         </Link>
@@ -284,8 +275,8 @@ const CategoriesSection = ({ categories }: { categories: Category[] }) => (
           <Link
             href={`/rubriques/${category.slug.current}`}
             key={category._id}
-            className="whitespace-nowrap px-4 py-2 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-800 text-sm font-medium flex-shrink-0 transition-colors"
-            aria-label={`Voir la rubrique ${category.title}`} // Added aria-label
+            className="whitespace-nowrap px-4 py-2 rounded-full bg-gray-100 hover:bg-red-50 text-gray-800 hover:text-red-600 text-sm font-medium flex-shrink-0 transition-colors"
+            aria-label={`Voir la rubrique ${category.title}`}
           >
             {category.title}
           </Link>

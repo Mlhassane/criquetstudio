@@ -75,7 +75,7 @@ async function CategoryDetail({ params }: { params: Promise<{ slug: string }> })
     <main className="max-w-7xl mx-auto p-6 fade-in">
       <Link
         href="/rubriques"
-        className="inline-flex items-center text-sm font-medium text-indigo-600 hover:text-indigo-800 transition-colors duration-300"
+        className="inline-flex items-center text-sm font-medium text-red-600 hover:text-red-800 transition-colors duration-300"
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -99,7 +99,7 @@ async function CategoryDetail({ params }: { params: Promise<{ slug: string }> })
         {description && (
           <p className="text-xl text-gray-600 max-w-3xl">{description}</p>
         )}
-        <div className="w-20 h-1 bg-indigo-600 mt-6"></div>
+        <div className="w-20 h-1 bg-red-600 mt-6"></div>
       </div>
 
       {posts.length === 0 ? (
@@ -139,10 +139,10 @@ async function CategoryDetail({ params }: { params: Promise<{ slug: string }> })
                     className="object-cover transform group-hover:scale-105 transition-transform duration-500"
                   />
                 ) : (
-                  <div className="w-full h-full bg-gradient-to-br from-indigo-100 to-purple-100 flex items-center justify-center">
+                  <div className="w-full h-full bg-gradient-to-br from-red-50 to-rose-50 flex items-center justify-center">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
-                      className="h-12 w-12 text-indigo-300"
+                      className="h-12 w-12 text-red-300"
                       fill="none"
                       viewBox="0 0 24 24"
                       stroke="currentColor"
@@ -156,7 +156,7 @@ async function CategoryDetail({ params }: { params: Promise<{ slug: string }> })
                     </svg>
                   </div>
                 )}
-                <div className="absolute top-0 right-0 bg-indigo-600 text-white px-3 py-1 text-xs m-3 rounded-full">
+                <div className="absolute top-0 right-0 bg-red-600 text-white px-3 py-1 text-xs m-3 rounded-full">
                   {new Date(post.publishedAt).toLocaleDateString("fr-FR", {
                     day: "numeric",
                     month: "short",
@@ -165,7 +165,7 @@ async function CategoryDetail({ params }: { params: Promise<{ slug: string }> })
                 </div>
               </div>
               <div className="p-6">
-                <h2 className="text-xl font-bold text-gray-900 group-hover:text-indigo-600 transition-colors">
+                <h2 className="text-xl font-bold text-gray-900 group-hover:text-red-600 transition-colors">
                   {post.title}
                 </h2>
                 {post.excerpt && (
@@ -173,7 +173,7 @@ async function CategoryDetail({ params }: { params: Promise<{ slug: string }> })
                 )}
                 {post.author?.name && (
                   <div className="flex items-center mt-4 pt-4 border-t border-gray-100">
-                    <div className="w-8 h-8 bg-indigo-100 rounded-full flex items-center justify-center text-indigo-500 font-medium">
+                    <div className="w-8 h-8 bg-red-100 rounded-full flex items-center justify-center text-red-500 font-medium">
                       {post.author.name.charAt(0)}
                     </div>
                     <p className="ml-2 text-sm text-gray-600">
@@ -182,7 +182,7 @@ async function CategoryDetail({ params }: { params: Promise<{ slug: string }> })
                   </div>
                 )}
                 <div className="mt-4 flex justify-end">
-                  <span className="inline-flex items-center text-sm font-medium text-indigo-600 group-hover:translate-x-1 transition-transform duration-300">
+                  <span className="inline-flex items-center text-sm font-medium text-red-600 group-hover:translate-x-1 transition-transform duration-300">
                     Lire l'article
                     <svg
                       xmlns="http://www.w3.org/2000/svg"

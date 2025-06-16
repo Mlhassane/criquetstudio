@@ -104,15 +104,15 @@ const ArticleContent = async ({ params }: { params: Promise<{ slug: string }> })
     <div className="min-h-screen bg-white">
       {/* Hero Image with overlay */}
       {post.mainImage && (
-        <div className="relative w-full h-[40vh] md:h-[60vh]">
+        <div className="relative w-full h-[40vh] md:h-[60vh] group">
           <Image
             src={urlForImage(post.mainImage).width(1920).height(1080).url()}
             alt={post.title}
             fill
-            className="object-cover"
+            className="object-cover transition-transform duration-500 group-hover:scale-105"
             sizes="100vw"
           />
-          <div className="absolute inset-0 bg-black/30" />
+          <div className="absolute inset-0 bg-gradient-to-b from-black/40 to-black/60" /> {/* Gradient au lieu d'une overlay uniforme */}
         </div>
       )}
 
@@ -135,7 +135,7 @@ const ArticleContent = async ({ params }: { params: Promise<{ slug: string }> })
             {post.categories && post.categories[0] && (
               <Link
                 href={`/rubriques/${post.categories[0].slug.current}`}
-                className="bg-black text-white px-3 py-1 rounded-full text-sm font-medium hover:bg-red-600 transition-colors"
+                className="bg-primary text-white px-3 py-1 rounded-full text-sm font-medium hover:bg-red-600 transition-colors"
               >
                 {post.categories[0].title}
               </Link>
@@ -177,11 +177,11 @@ const ArticleContent = async ({ params }: { params: Promise<{ slug: string }> })
             </div>
 
             <div className="flex items-center gap-3">
-              <button className="p-2 rounded-full hover:bg-gray-100 flex items-center gap-1 text-gray-600 text-sm">
+              <button className="p-2 rounded-full hover:bg-gray-100 flex items-center gap-1 text-gray-600 text-sm transition-all duration-300 hover:scale-105">
                 <Share2 className="w-5 h-5" />
                 Partager
               </button>
-              <button className="p-2 rounded-full hover:bg-gray-100 flex items-center gap-1 text-gray-600 text-sm">
+              <button className="p-2 rounded-full hover:bg-gray-100 flex items-center gap-1 text-gray-600 text-sm transition-all duration-300 hover:scale-105">
                 <Bookmark className="w-5 h-5" />
                 Sauvegarder
               </button>
@@ -195,17 +195,41 @@ const ArticleContent = async ({ params }: { params: Promise<{ slug: string }> })
 
           {/* YouTube Video (if available) */}
           {post.youtubeUrl && (
-            <div className="relative w-full aspect-video my-8 rounded-lg overflow-hidden shadow-md">
-              <iframe
-                className="absolute top-0 left-0 w-full h-full"
-                src={`https://www.youtube.com/embed/${
-                  post.youtubeUrl.split("v=")[1] || ""
-                }`}
-                title="YouTube video player"
-                frameBorder="0"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowFullScreen
-              ></iframe>
+            <div className="relative w-full aspect-video my-8 group">
+              <div className="absolute inset-0 rounded-lg overflow-hidden shadow-lg">
+                <iframe
+                  className="absolute top-0 left-0 w-full h-full"
+                  src={`https://www.youtube.com/embed/${getYoutubeVideoId(post.youtubeUrl)}`}
+                  title="YouTube video player"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                ></iframe>
+
+                <a
+                  href={post.youtubeUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="absolute inset-0 bg-primary bg-opacity-0 group-hover:bg-opacity-10 transition-all duration-300 flex items-center justify-center"
+                >
+                  <div className="transform translate-y-8 group-hover:translate-y-0 opacity-0 group-hover:opacity-100 transition-all duration-300">
+                    <span className="bg-red-600 text-white px-4 py-2 rounded-lg shadow-lg flex items-center gap-2">
+                      <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z"/>
+                      </svg>
+                      Voir sur YouTube
+                    </span>
+                  </div>
+                </a>
+              </div>
+
+              <div className="absolute -bottom-4 left-0 w-full flex justify-center">
+                <div className="bg-white shadow-md rounded-full px-4 py-2 text-sm text-gray-600 flex items-center gap-2">
+                  <svg className="w-4 h-4 text-red-600" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z"/>
+                  </svg>
+                  Regarder la vidéo complète
+                </div>
+              </div>
             </div>
           )}
 
@@ -240,9 +264,9 @@ const ArticleContent = async ({ params }: { params: Promise<{ slug: string }> })
                 <Link
                   href={`/articles/${article.slug.current}`}
                   key={article._id}
-                  className="group"
+                  className="group transform transition-all duration-300 hover:-translate-y-1"
                 >
-                  <div className="overflow-hidden rounded-lg shadow-md">
+                  <div className="overflow-hidden rounded-xl shadow-md hover:shadow-xl transition-shadow duration-300">
                     <div className="relative w-full h-48 overflow-hidden">
                       {article.mainImage ? (
                         <Image
@@ -259,7 +283,7 @@ const ArticleContent = async ({ params }: { params: Promise<{ slug: string }> })
                       )}
                       {article.categories && article.categories[0] && (
                         <div className="absolute bottom-0 left-0 m-3">
-                          <span className="bg-black bg-opacity-70 text-white text-xs px-2 py-1 rounded">
+                          <span className="bg-primary bg-opacity-70 text-white text-xs px-2 py-1 rounded">
                             {article.categories[0].title}
                           </span>
                         </div>
@@ -339,23 +363,24 @@ const ArticleContent = async ({ params }: { params: Promise<{ slug: string }> })
         </div>
 
         {/* Newsletter */}
-        <div className="max-w-4xl mx-auto mb-16 py-12 px-8 bg-gray-50 rounded-xl shadow-sm">
+        <div className="max-w-4xl mx-auto mb-16 py-12 px-8 bg-gradient-to-br from-gray-50 to-white rounded-xl shadow-md">
           <div className="max-w-xl mx-auto text-center">
+            <span className="text-red-600 text-sm font-medium mb-2 block">NEWSLETTER</span>
             <h3 className="text-2xl font-bold mb-4">Restez informé</h3>
             <p className="text-gray-600 mb-6">
               Abonnez-vous à notre newsletter hebdomadaire et recevez les dernières informations
               directement dans votre boîte mail
             </p>
-            <form className="flex flex-col sm:flex-row gap-3">
+            <form className="flex flex-col sm:flex-row gap-3 group">
               <input
                 type="email"
                 placeholder="Votre adresse email"
-                className="flex-grow px-4 py-3 rounded-lg border focus:outline-none focus:ring-2 focus:ring-red-600 transition-all"
+                className="flex-grow px-4 py-3 rounded-lg border focus:outline-none focus:ring-2 focus:ring-red-600 transition-all bg-white/80 backdrop-blur-sm"
                 required
               />
               <button
                 type="submit"
-                className="bg-red-600 text-white font-medium px-6 py-3 rounded-lg hover:bg-red-700 transition-colors shadow-sm"
+                className="bg-red-600 text-white font-medium px-6 py-3 rounded-lg hover:bg-red-700 transition-all duration-300 transform hover:-translate-y-1 shadow-md hover:shadow-lg"
               >
                 S'abonner
               </button>
@@ -377,6 +402,13 @@ export async function generateStaticParams() {
     slug: post.slug.current,
   }));
 }
+
+// Ajoutez cette fonction utilitaire en haut du fichier
+const getYoutubeVideoId = (url: string): string | null => {
+  const regex = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/;
+  const match = url.match(regex);
+  return match ? match[1] : null;
+};
 
 export default async function ArticlePage({ params }: PageProps) {
   return (
