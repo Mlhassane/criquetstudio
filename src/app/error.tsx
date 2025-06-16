@@ -22,7 +22,7 @@ export default function Error({
         onClick={reset}
         className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition-colors"
       >
-        Réessayer
+        Réessayer encore
       </button>
     </div>
   )
