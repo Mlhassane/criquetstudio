@@ -492,13 +492,13 @@ const HomeContent = async () => {
   return (
     <>
       {/* Articles */}
-{/*       <HeroSection featuredArticle={featuredArticle} sidebarArticles={sidebarArticles} />
+      <HeroSection featuredArticle={featuredArticle} sidebarArticles={sidebarArticles} />
       <TrendingSection articles={trendingArticles} />
       <LatestNewsSection articles={latestArticles} />
-      <RegionalNewsSection articles={regionalArticles} /> */}
+      <RegionalNewsSection articles={regionalArticles} />
 
       {/* Catégories */}
-{/*       <CategoriesSection categories={categories} /> */}
+      <CategoriesSection categories={categories} />
 
       {/* Autres */}
       {/* <EventSection /> */}
