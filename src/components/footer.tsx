@@ -1,7 +1,9 @@
 'use client'
-import { useState, useEffect } from 'react'
 
-// Composants d'icônes personnalisés
+import { motion } from "framer-motion"
+import { useState } from "react"
+
+// Icônes personnalisées
 const YouTubeIcon = () => (
   <svg viewBox="0 0 24 24" className="h-6 w-6" fill="currentColor">
     <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
@@ -27,92 +29,40 @@ const TikTokIcon = () => (
 );
 
 const Footer: React.FC = () => {
-  const [isVisible, setIsVisible] = useState(false)
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setIsVisible(true)
-        }
-      },
-      { threshold: 0.1 }
-    )
-
-    const footerElement = document.getElementById('footer')
-    if (footerElement) {
-      observer.observe(footerElement)
-    }
-
-    return () => observer.disconnect()
-  }, [])
-
   const socialLinks = [
-    {
-      name: "YouTube",
-      icon: <YouTubeIcon />,
-      href: "https://www.youtube.com/@CriquetStudio",
-      hoverColor: "hover:text-white hover:bg-primary",
-      bgColor: "group-hover:bg-primary"
-    },
-    {
-      name: "Facebook", 
-      icon: <FacebookIcon />,
-      href: "https://www.facebook.com/share/1EgUaU4H5n/",
-      hoverColor: "hover:text-white hover:bg-primary",
-      bgColor: "group-hover:bg-primary"
-    },
-    {
-      name: "LinkedIn",
-      icon: <LinkedInIcon />,
-      href: "https://www.linkedin.com/company/criquet-studio",
-      hoverColor: "hover:text-white hover:bg-primary",
-      bgColor: "group-hover:bg-primary"
-    },
-    {
-      name: "TikTok",
-      icon: <TikTokIcon />,
-      href: "https://www.tiktok.com/@criquetstudio",
-      hoverColor: "hover:text-white hover:bg-primary",
-      bgColor: "group-hover:bg-primary"
-    }
+    { name: "YouTube", icon: <YouTubeIcon />, href: "https://www.youtube.com/@CriquetStudio" },
+    { name: "Facebook", icon: <FacebookIcon />, href: "https://www.facebook.com/share/1EgUaU4H5n/" },
+    { name: "LinkedIn", icon: <LinkedInIcon />, href: "https://www.linkedin.com/company/criquet-studio" },
+    { name: "TikTok", icon: <TikTokIcon />, href: "https://www.tiktok.com/@criquetstudio" }
   ]
 
+  const [email, setEmail] = useState("")
+
   return (
-    <footer 
-      id="footer" 
-      className="relative overflow-hidden bg-white text-primary"
-    >
-      {/* Animated background elements */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        {/* <div className="absolute -top-20 -left-20 w-40 h-40 bg-primary rounded-full mix-blend-multiply filter blur-xl opacity-5 animate-pulse"></div> */}
-        {/* <div className="absolute -bottom-20 -right-20 w-40 h-40 bg-primary rounded-full mix-blend-multiply filter blur-xl opacity-5 animate-pulse" style={{animationDelay: '2s'}}></div> */}
-        {/* <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-32 h-32 bg-primary rounded-full mix-blend-multiply filter blur-xl opacity-5 animate-pulse" style={{animationDelay: '4s'}}></div> */}
-      </div>
-
-      {/* Decorative top border */}
-      {/* <div className="h-1 bg-primary"></div> */}
-
+    <footer className="relative overflow-hidden bg-white text-primary">
       <div className="container mx-auto px-4 py-12">
-        <div className={`grid grid-cols-1 md:grid-cols-3 gap-8 lg:gap-12 transform transition-all duration-1000 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
-          
-          {/* Section Branding */}
-          <div className="space-y-4">
-            <div className="group">
-              <h3 className="font-bold text-2xl mb-4 text-primary group-hover:text-gray-700 transition-all duration-500">
-                Criquet Broadcast Studio
-              </h3>
-              <p className="text-gray-600 leading-relaxed hover:text-primary transition-colors duration-300">
-                Le média du bien-être.
-              </p>
-            </div>
-            
-            {/* Decorative element */}
-            <div className="w-16 h-1 bg-primary rounded-full transform origin-left hover:scale-x-150 transition-transform duration-500"></div>
-          </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-12 lg:gap-16">
 
-          {/* Section Navigation */}
-          <div className={`transform transition-all duration-1000 delay-200 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
+          {/* Branding */}
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }} 
+            whileInView={{ opacity: 1, y: 0 }} 
+            transition={{ duration: 0.8 }}
+            viewport={{ once: true }}
+          >
+            <h3 className="font-bold text-2xl mb-4 text-primary">Criquet Broadcast Studio</h3>
+            <p className="text-gray-600 leading-relaxed">Le média du bien-être.</p>
+            <div className="w-16 h-1 bg-primary rounded-full mt-4"></div>
+          </motion.div>
+
+          {/* Navigation */}
+          <motion.nav 
+            aria-label="Liens d’information"
+            initial={{ opacity: 0, y: 20 }} 
+            whileInView={{ opacity: 1, y: 0 }} 
+            transition={{ duration: 0.8, delay: 0.2 }}
+            viewport={{ once: true }}
+          >
             <h3 className="font-bold text-xl mb-6 text-primary">À propos</h3>
             <ul className="space-y-3">
               {[
@@ -130,71 +80,71 @@ const Footer: React.FC = () => {
                 </li>
               ))}
             </ul>
-          </div>
+          </motion.nav>
 
-          {/* Section Social Links */}
-          <div className={`transform transition-all duration-1000 delay-400 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
-            <h3 className="font-bold text-xl mb-6 text-primary">Suivez-nous</h3>
+          {/* Newsletter + Socials */}
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }} 
+            whileInView={{ opacity: 1, y: 0 }} 
+            transition={{ duration: 0.8, delay: 0.4 }}
+            viewport={{ once: true }}
+          >
+            <h3 className="font-bold text-xl mb-6 text-primary">Restez connectés</h3>
+
+            {/* Newsletter */}
+            <form 
+              onSubmit={(e) => { e.preventDefault(); setEmail(""); alert("Merci de votre inscription !") }}
+              className="flex gap-2 mb-6"
+            >
+              <input 
+                type="email" 
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="Votre email" 
+                className="flex-1 px-4 py-2 rounded-lg border focus:ring-primary focus:outline-none"
+                required
+              />
+              <button className="bg-primary text-white px-4 py-2 rounded-lg hover:bg-primary/80">
+                S’abonner
+              </button>
+            </form>
+
+            {/* Social Links */}
             <div className="flex gap-4">
               {socialLinks.map((social, index) => (
                 <a
                   key={index}
                   href={social.href}
-                  className={`group relative p-3 rounded-full bg-primary/5 border border-black/10 text-primary transition-all duration-300 hover:scale-110 hover:-translate-y-1 hover:shadow-2xl ${social.hoverColor}`}
+                  aria-label={social.name}
+                  className="group relative p-2 md:p-3 rounded-full bg-primary/5 border border-black/10 text-primary transition-all duration-300 hover:scale-110 hover:-translate-y-1 hover:shadow-2xl"
                   target="_blank"
                   rel="noopener noreferrer"
-                  style={{animationDelay: `${index * 0.1}s`}}
                 >
-                  <span className="sr-only">{social.name}</span>
-                  <div className="relative z-10">
-                    {social.icon}
-                  </div>
-                  
-                  {/* Background on hover */}
-                  <div className={`absolute inset-0 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300 ${social.bgColor}`}></div>
-                  
-                  {/* Ripple effect */}
-                  <div className="absolute inset-0 rounded-full bg-primary opacity-0 group-hover:opacity-10 group-hover:animate-ping"></div>
+                  {social.icon}
                 </a>
               ))}
             </div>
-          </div>
+          </motion.div>
         </div>
 
-        {/* Section Copyright */}
-        <div className="mt-12 pt-8 border-t border-black/10">
-          <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-            <p className="text-gray-600 hover:text-primary transition-colors duration-300">
-              © 2025 Criquet Broadcast Studio. Tous droits réservés.
-            </p>
-            
-            {/* Pulse indicator */}
-
-          </div>
+        {/* Bas de page */}
+        <div className="mt-12 pt-8 border-t border-black/10 flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-gray-600">
+          <p>© 2025 Criquet Broadcast Studio. Tous droits réservés.</p>
+          <p>
+            Fait avec 🧡 par{" "}
+            <a 
+              href="https://sorcidigit.com" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="text-primary font-semibold hover:underline"
+            >
+              Sorci Digit
+            </a>
+          </p>
         </div>
       </div>
-
-      {/* Animated line at bottom */}
-      <div className="absolute bottom-0 left-0 w-full h-1 bg-primary">
-        <div className="h-full bg-gradient-to-r from-transparent via-gray-300 to-transparent opacity-50 animate-pulse"></div>
-      </div>
-
-       <style jsx>{`
-        @keyframes float {
-          0%, 100% { transform: translateY(0px); }
-          50% { transform: translateY(-5px); }
-        }
-        
-        .animate-float {
-          animation: float 3s ease-in-out infinite;
-        }
-        
-        @keyframes shimmer {
-          0% { transform: translateX(-100%); }
-          100% { transform: translateX(100%); }
-        }
-      `}</style>
     </footer>
   )
 }
-export default Footer;
+
+export default Footer
